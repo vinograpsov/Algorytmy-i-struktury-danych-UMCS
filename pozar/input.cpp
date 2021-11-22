@@ -6,26 +6,51 @@ using namespace std;
 
 int codeType(char symbol){
     if (symbol == '.'){
-        return 1001;
+        return 1000001;
     }
     else if(symbol == '#')
     {
-        return 1002;
+        return 1000002;
     }
     else if(symbol == 'O')
     {
-        return 1003;
+        return 1000003;
     }
     else if (symbol == 'M')
     {
-        return 1004;
+        return 1000004;
     }
     else
     {
-        return 1005; //error code
+        return 1000005; //error code
     }
     
 } 
+
+int makeStepArr(int arrKind, int* arr,int value){
+    if(arrKind == 1){
+        if (value != 1000004){
+            return value;
+        }
+        else
+        {
+            return 1000001;
+        }
+        
+    }
+    else
+    {
+        if (value != 1000003){
+            return value;
+        }
+        else
+        {
+            return 1000001;
+        }
+    }
+    
+}
+
 
 
 
@@ -53,13 +78,19 @@ int main(){
     for (int k = 0; k < numOfTests; k++){
         int m,n;
         cin >> n >> m;
-        int *arr = new int[n*m];
+        int *fireArr = new int[n*m];
+        int *manStepArr = new int [n*m]; 
         for (int i = 0; i< n*m;i++){
             char symbol;
             cin >> symbol;
-            arr[i] = codeType(symbol);
+            fireArr[i] = makeStepArr(0,fireArr,codeType(symbol));
+            manStepArr[i] = makeStepArr(1,manStepArr,codeType(symbol));
         }
-        testInp(arr,n,m);
+        cout << "\n";
+        testInp(fireArr,n,m);
+        cout << "\n";
+        cout << "\n";
+        testInp(manStepArr,n,m);
         cout << "\n";
     } 
 
