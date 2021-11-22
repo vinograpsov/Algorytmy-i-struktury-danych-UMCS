@@ -1,28 +1,40 @@
 #include <iostream>
-// typedef unsigned un;
 using namespace std;
-// redo to unsigned short int 
+
+struct Point 
+{
+    int x;
+    int y;
+};
+
+struct ExitPoint
+{
+    Point exit;
+    int manStepCount;
+    int fireStepCount;
+};
+
 
 
 int codeType(char symbol){
     if (symbol == '.'){
-        return 1000001;
+        return 1;
     }
     else if(symbol == '#')
     {
-        return 1000002;
+        return 0;
     }
     else if(symbol == 'O')
     {
-        return 1000003;
+        return 3;
     }
     else if (symbol == 'M')
     {
-        return 1000004;
+        return 4;
     }
     else
     {
-        return 1000005; //error code
+        return -1; //error code
     }
     
 } 
@@ -70,30 +82,81 @@ void testInp(int* arr,int n, int m){
 
 
 int main(){
+    // получаем количество тестов
     int numOfTests;
-    //Node *labirints = NULL;
     cin >> numOfTests;
     
+    // проверка на ошибки
+    bool noErrors = true;
+
+    // получаем одну таблицу
+    for (int k = 0; k < numOfTests && noErrors; k++){
+        //  получаем строки и столбцы тут может быть ошибка
+        int rows,cols;
+        cin >> rows >> cols;
+        
+        
+        //создаем таблицу с выходными точками,позиция чела,таблица позиций огня
+
+        ExitPoint* exitPoints = new ExitPoint[];
+        int exitNum = 0;
+        Point manPosition;
+        Point* firePositions = new Point[]; // ?????????? 
+        int fireNum = 0;
     
-    for (int k = 0; k < numOfTests; k++){
-        int m,n;
-        cin >> n >> m;
-        int *fireArr = new int[n*m];
-        int *manStepArr = new int [n*m]; 
-        for (int i = 0; i< n*m;i++){
-            char symbol;
-            cin >> symbol;
-            fireArr[i] = makeStepArr(0,fireArr,codeType(symbol));
-            manStepArr[i] = makeStepArr(1,manStepArr,codeType(symbol));
+        //создание лабиринта 
+        int** maze = new int* [rows];
+        for (int i = 0; i < rows; i++){
+            maze[i] = new int[cols];;
         }
-        cout << "\n";
-        testInp(fireArr,n,m);
-        cout << "\n";
-        cout << "\n";
-        testInp(manStepArr,n,m);
-        cout << "\n";
+
+
+
+        //запись в лабиринт тут тоже может быть ошибка 
+        for (int i = 0; i < rows; i++){
+            for(int j = 0; j < cols; j++){
+                char symbol;
+                cin >> symbol;
+                int intSymbol = codeType(symbol);
+                
+                //проверка входит ли символ
+                if (intSymbol == -1) noErrors = false;
+
+                //считаем и добавляем токи выхода
+                if ((i == 0 || i == rows - 1) && intSymbol == 1){
+                    exitPoints[exitNum].exit.x = cols;
+                    exitPoints[exitNum].exit.y = rows;
+                    fireNum++;
+                }
+                else if((j == 0 || j == cols - 1) && intSymbol == 1){
+                    exitPoints[exitNum].exit.x = cols;
+                    exitPoints[exitNum].exit.y = rows;
+                    fireNum++;
+                }
+                
+                
+                //заполняем хаш - 0, точка - 1
+                if(intSymbol == 1 || intSymbol == 0) maze[i][j] = intSymbol;                
+                
+                // огонь будет равен хашу и добавляем огонь в свою точку 
+                else if(intSymbol == 3){
+                    firePositions[fireNum].x = cols; //??????
+                    firePositions[fireNum].y = rows; //??????
+                    fireNum++;
+                    maze[i][j] = 0;
+                }               
+                
+                // чувака записываем и принимает его положение за точку 
+                else if(intSymbol == 4){
+                    manPosition.x = cols; // ??????
+                    manPosition.y = rows; // ??????
+                    maze[i][j] = 1;
+                }                 
+                
+
+                
+            }
+        }
     } 
-
-
 }
     
