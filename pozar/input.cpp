@@ -66,14 +66,12 @@ int makeStepArr(int arrKind, int* arr,int value){
 
 
 
-void testInp(int* arr,int n, int m){
-    for (int i = 0; i< n * m;i++){
-        if (i % n == 0 && i != 0){
-            cout << "\n";
+void testInp(int** arr,int rows, int cols){
+    for (int i = 0;i < rows;i++){
+        for(int j = 0;j < cols;j++){
+            cout << arr[i][j] << " ";
         }
-        
-        cout << arr[i] << " ";
-        
+        cout << "\n";
     }
 }  
 
@@ -97,11 +95,10 @@ int main(){
         
         
         //создаем таблицу с выходными точками,позиция чела,таблица позиций огня
-
-        ExitPoint* exitPoints = new ExitPoint[];
+        ExitPoint* exitPoints = new ExitPoint[cols*2 + (rows -2)*2]; // переделать это либо под векторы либо по чтото другое 
         int exitNum = 0;
         Point manPosition;
-        Point* firePositions = new Point[]; // ?????????? 
+        Point* firePositions = new Point[rows * cols - cols*2 - (rows -2)*2]; // ?????????? 
         int fireNum = 0;
     
         //создание лабиринта 
@@ -124,14 +121,14 @@ int main(){
 
                 //считаем и добавляем токи выхода
                 if ((i == 0 || i == rows - 1) && intSymbol == 1){
-                    exitPoints[exitNum].exit.x = cols;
-                    exitPoints[exitNum].exit.y = rows;
-                    fireNum++;
+                    exitPoints[exitNum].exit.x = j;
+                    exitPoints[exitNum].exit.y = i;
+                    exitNum++;
                 }
                 else if((j == 0 || j == cols - 1) && intSymbol == 1){
-                    exitPoints[exitNum].exit.x = cols;
-                    exitPoints[exitNum].exit.y = rows;
-                    fireNum++;
+                    exitPoints[exitNum].exit.x = j;
+                    exitPoints[exitNum].exit.y = i;
+                    exitNum++;
                 }
                 
                 
@@ -140,23 +137,29 @@ int main(){
                 
                 // огонь будет равен хашу и добавляем огонь в свою точку 
                 else if(intSymbol == 3){
-                    firePositions[fireNum].x = cols; //??????
-                    firePositions[fireNum].y = rows; //??????
+                    firePositions[fireNum].x = j; //??????
+                    firePositions[fireNum].y = i; //??????
                     fireNum++;
                     maze[i][j] = 0;
                 }               
                 
                 // чувака записываем и принимает его положение за точку 
                 else if(intSymbol == 4){
-                    manPosition.x = cols; // ??????
-                    manPosition.y = rows; // ??????
+                    manPosition.x = j; // ??????
+                    manPosition.y = i; // ??????
                     maze[i][j] = 1;
                 }                 
                 
 
                 
             }
+            
         }
+        testInp(maze,rows,cols);
+        cout << manPosition.x << " " << manPosition.y << "\n";
+        cout << firePositions[0].x << " "<< firePositions[0].y <<"\n";
+        cout << exitPoints[0].exit.x << " " << exitPoints[0].exit.y << "\n";
+        cout << exitPoints[1].exit.x << " " << exitPoints[1].exit.y << "\n";
     } 
 }
     
