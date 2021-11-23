@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 using namespace std;
 
 struct Point 
@@ -95,10 +96,10 @@ int main(){
         
         
         //создаем таблицу с выходными точками,позиция чела,таблица позиций огня
-        ExitPoint* exitPoints = new ExitPoint[cols*2 + (rows -2)*2]; // переделать это либо под векторы либо по чтото другое 
+        vector<ExitPoint> exitPoints;
         int exitNum = 0;
         Point manPosition;
-        Point* firePositions = new Point[rows * cols - cols*2 - (rows -2)*2]; // ?????????? 
+        vector<Point> firePositions; 
         int fireNum = 0;
     
         //создание лабиринта 
@@ -121,13 +122,17 @@ int main(){
 
                 //считаем и добавляем токи выхода
                 if ((i == 0 || i == rows - 1) && intSymbol == 1){
-                    exitPoints[exitNum].exit.x = j;
-                    exitPoints[exitNum].exit.y = i;
+                    ExitPoint temp;
+                    temp.exit.x = j;
+                    temp.exit.y = i;
+                    exitPoints.insert(exitPoints.end(),temp);
                     exitNum++;
                 }
                 else if((j == 0 || j == cols - 1) && intSymbol == 1){
-                    exitPoints[exitNum].exit.x = j;
-                    exitPoints[exitNum].exit.y = i;
+                    ExitPoint temp;
+                    temp.exit.x = j;
+                    temp.exit.y = i;
+                    exitPoints.insert(exitPoints.end(),temp);
                     exitNum++;
                 }
                 
@@ -137,8 +142,10 @@ int main(){
                 
                 // огонь будет равен хашу и добавляем огонь в свою точку 
                 else if(intSymbol == 3){
-                    firePositions[fireNum].x = j; //??????
-                    firePositions[fireNum].y = i; //??????
+                    Point temp;
+                    temp.x = j;
+                    temp.y = i;
+                    firePositions.insert(firePositions.end(),temp);
                     fireNum++;
                     maze[i][j] = 0;
                 }               
@@ -158,8 +165,9 @@ int main(){
         testInp(maze,rows,cols);
         cout << manPosition.x << " " << manPosition.y << "\n";
         cout << firePositions[0].x << " "<< firePositions[0].y <<"\n";
-        cout << exitPoints[0].exit.x << " " << exitPoints[0].exit.y << "\n";
-        cout << exitPoints[1].exit.x << " " << exitPoints[1].exit.y << "\n";
+        for (int i = 0; i < exitNum;i++){
+            cout << exitPoints[i].exit.x << " " << exitPoints[i].exit.y << "\n";
+        }
     } 
 }
     
