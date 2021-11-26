@@ -159,6 +159,7 @@ int BFS(/*int mat[][COL]*/ int** mat, Point start, Point exit, int arrRow, int a
 
 
 int main(){
+    vector<int> answers;  
     // получаем количество тестов
     int numOfTests;
     cin >> numOfTests;
@@ -234,12 +235,37 @@ int main(){
             }
             
         }
-        testInp(maze,rows,cols);
-        cout << manPosition.x << " " << manPosition.y << "\n";
-        cout << firePositions[0].x << " "<< firePositions[0].y <<"\n";
-        cout << exitPoints[0].exit.x << " " << exitPoints[0].exit.y << "\n";
-        cout << exitPoints[1].exit.x << " " << exitPoints[1].exit.y << "\n";
-        cout << BFS(maze,manPosition,exitPoints[1].exit,rows,cols);
+
+        //записываем все кротчайшие пути мужива
+        for (int i = 0; i < exitNum; i++){
+            exitPoints[i].manStepCount = BFS(maze,manPosition,exitPoints[i].exit,rows,cols) + 1 ;
+        }
+
+        //делаем лабириинт для огня mb errorHere
+        for(int i = 0;i < fireNum;i++){
+            maze[firePositions[i].x][firePositions[i].y] = 1;
+        }
+
+        //записываем все кротчайшие пути огня 
+        for(int i = 0;i < exitNum;i++){
+            for(int j = 0 ; j < fireNum;j++){
+                int temp = BFS(maze,firePositions[j],exitPoints[i].exit,rows,cols) + 1;
+                if(exitPoints[i].fireStepCount > temp || exitPoints[i].fireStepCount == -1) exitPoints[i].fireStepCount = temp;
+            }
+        }
+
+        int shortestWay = -1;
+        for(int i = 0; i < exitNum;i++){
+            if(exitPoints[i].fireStepCount > exitPoints[i].manStepCount || shortestWay == -1) shortestWay = exitPoints[i].manStepCount;
+        }
+
+        answers.insert(answers.end(),shortestWay);
+
     } 
+    // петля которая выводит ответы ечли -1 выписывает нет 
+    for(int i = 0; i < numOfTests;i++){
+        if(answers[i] == -1) cout << "NIE" << "\n";
+        else cout << answers[i] << "\n";
+    }
 }
     
