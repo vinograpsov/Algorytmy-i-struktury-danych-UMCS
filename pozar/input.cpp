@@ -1,4 +1,9 @@
 #include <iostream>
+#include <queue>
+#include <cstring>
+
+
+
 using namespace std;
 
 struct Point 
@@ -14,6 +19,11 @@ struct ExitPoint
     int fireStepCount;
 };
 
+struct  queueNode
+{
+    Point pt;
+    int dist; 
+};
 
 
 int codeType(char symbol){
@@ -75,7 +85,76 @@ void testInp(int** arr,int rows, int cols){
     }
 }  
 
+void testBFS(bool** arr,int rows,int cols){
+    for (int i = 0;i < rows;i++){
+        for(int j = 0;j < cols;j++){
+            cout << arr[i][j] << " ";
+        }
+        cout << "\n";
+    }
+}
 
+
+
+bool isValid(int row, int col, int ROW, int COL)
+{
+    return (row >= 0) && (row < ROW) && (col >= 0) && (col < COL);
+}
+
+int rowNum[] = {-1, 0, 0, 1};
+int colNum[] = {0, -1, 1, 0};
+ 
+
+int BFS(/*int mat[][COL]*/ int** mat, Point start, Point exit, int arrRow, int arrCol)
+{
+
+    bool** visited = new bool* [arrRow];
+    for (int i = 0; i < arrRow; i++){
+        visited[i] = new bool[arrCol];;
+    }
+
+    for(int i = 0;i < arrRow; i++){
+        for(int j = 0;j < arrCol; j++){
+            visited[i][j] = false;
+        }
+    }
+ 
+    visited[start.x][start.y] = true;
+    
+    queue<queueNode> q;
+    
+    queueNode s = {start, 0};
+    
+    q.push(s);  
+   
+   
+    while (!q.empty())
+    {
+        queueNode curr = q.front();
+        Point pt = curr.pt;
+        
+        if (pt.x == exit.y && pt.y == exit.x) //??????? тут ошибочка поправил но выглядит оч тупо 
+            return curr.dist;
+  
+        q.pop();
+ 
+        for (int i = 0; i < 4; i++)
+        {
+            int row = pt.x + rowNum[i];
+            int col = pt.y + colNum[i];
+             
+            if (isValid(row, col, arrRow,arrCol) && mat[row][col] &&
+               !visited[row][col])
+            {
+                visited[row][col] = true;
+                queueNode Adjcell = { {row, col},curr.dist + 1 };
+                q.push(Adjcell);
+            }
+        }
+    }
+    testBFS(visited,arrRow,arrCol);
+    return -1;
+}
 
 
 
@@ -160,6 +239,7 @@ int main(){
         cout << firePositions[0].x << " "<< firePositions[0].y <<"\n";
         cout << exitPoints[0].exit.x << " " << exitPoints[0].exit.y << "\n";
         cout << exitPoints[1].exit.x << " " << exitPoints[1].exit.y << "\n";
+        cout << BFS(maze,manPosition,exitPoints[1].exit,rows,cols);
     } 
 }
     
