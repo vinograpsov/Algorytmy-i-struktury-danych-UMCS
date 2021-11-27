@@ -243,7 +243,7 @@ int main(){
 
         //делаем лабириинт для огня mb errorHere
         for(int i = 0;i < fireNum;i++){
-            maze[firePositions[i].x][firePositions[i].y] = 1;
+            maze[firePositions[i].y][firePositions[i].x] = 1;
         }
 
         //записываем все кротчайшие пути огня 
