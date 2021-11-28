@@ -200,13 +200,21 @@ int main(){
 
                 //считаем и добавляем токи выхода
                 if ((i == 0 || i == y - 1) && intSymbol == 1){
-                    exitPoints[exitNum].exit.x = j;
-                    exitPoints[exitNum].exit.y = i;
+                    ExitPoint temp;
+                    temp.exit.x = j;
+                    temp.exit.y = i;
+                    temp.fireStepCount = -1;
+                    temp.manStepCount = -1;
+                    exitPoints.insert(exitPoints.end(), temp);
                     exitNum++;
                 }
                 else if((j == 0 || j == x - 1) && intSymbol == 1){
-                    exitPoints[exitNum].exit.x = j;
-                    exitPoints[exitNum].exit.y = i;
+                    ExitPoint temp;
+                    temp.exit.x = j;
+                    temp.exit.y = i;
+                    temp.fireStepCount = -1;
+                    temp.manStepCount = -1;
+                    exitPoints.insert(exitPoints.end(), temp);
                     exitNum++;
                 }
                 
@@ -216,8 +224,10 @@ int main(){
                 
                 // огонь будет равен хашу и добавляем огонь в свою точку 
                 else if(intSymbol == 3){
-                    firePositions[fireNum].x = j; //??????
-                    firePositions[fireNum].y = i; //??????
+                    Point temp;
+                    temp.x = j;
+                    temp.y = i;
+                    firePositions.insert(firePositions.end(),temp);
                     fireNum++;
                     maze[i][j] = 0;
                 }               
@@ -235,21 +245,10 @@ int main(){
             
         }
 
-
-        //делаем лабириинт для огня mb errorHere
-        for(int i = 0;i < fireNum;i++){
-            maze[firePositions[i].y][firePositions[i].x] = 1;
-        }
-
-        //записываем все кротчайшие пути огня 
-        for(int i = 0;i < exitNum;i++){
-            for(int j = 0 ; j < fireNum;j++){
-                int temp = BFS(maze,firePositions[j],exitPoints[i].exit,y,x) + 1;
-                if(exitPoints[i].fireStepCount > temp || exitPoints[i].fireStepCount == -1) {
-                    exitPoints[i].fireStepCount = temp;
-                    cout << temp << "\n";
-                }
-            }
+         //записываем все кротчайшие пути мужива
+        for (int i = 0; i < exitNum; i++){
+            exitPoints[i].manStepCount = BFS(maze,manPosition,exitPoints[i].exit,y,x) + 1 ;
+            cout << exitPoints[i].manStepCount << "\n";
         }
 
 
