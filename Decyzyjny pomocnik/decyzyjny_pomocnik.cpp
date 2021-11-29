@@ -12,11 +12,12 @@ struct Node
 };
 
 
-Node *append(Node** head_ref, string name, int num, int mode) // with son - 1, without - 0
+Node *append(Node* head_ref, string name, int num, int mode) // with son - 1, without - 0
 {
     Node* new_node = new Node();
     
-    Node* last = *head_ref;
+
+    Node* last = head_ref;
 
     new_node->name = name;
     new_node->num = num;
@@ -30,13 +31,24 @@ Node *append(Node** head_ref, string name, int num, int mode) // with son - 1, w
         return new_node;
     }
     else if(!mode){
-        while (last->next != NULL) last = last->next;
-    
-        last->next = new_node;
+        if (head_ref == NULL){
+            
+            return new_node;
+        
+        }
+        
+        else
+        {
+            
+            while (last->next != NULL) last = last->next;
 
-        new_node->prev = last;
-    
-        return new_node;
+            last->next = new_node;
+
+            new_node->prev = last;
+
+            return new_node;    
+        }
+        
     }
 }
 
@@ -68,5 +80,14 @@ int main(){
 
     //     }
     // }
-
+    
+    Node* tree = NULL;
+    tree = append(tree,"nic",0,0);
+    tree = append(tree,"firest son",1,1);
+    tree = append(tree,"brother",2,0);
+    tree = append(tree,"second son som",3,1);
+    tree = tree->father;
+    tree = tree->prev;
+    tree = append(tree,"firest son som",4,1);
+    cout << "ku";
 }
