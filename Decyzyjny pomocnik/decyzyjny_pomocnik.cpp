@@ -1,397 +1,199 @@
-#include<iostream>
+#include <iostream>
+#include <string>
 using namespace std;
 
-struct Sums
+struct Node
 {
-   int data;
-   struct Sums *next;
+    string name;
+    int num;
+    Node *next = NULL;
+    Node *prev = NULL;
+    Node *son = NULL;
+    Node *father = NULL;
 };
 
-bool hasElementsSumsBool(struct Sums *last)
+
+Node *append(Node* head_ref, string name, int num, int mode) // with son - 1, without - 0
 {
-   if (last == NULL) return false;
-   return true;
+    Node* new_node = new Node();
+    
+
+    Node* last = head_ref;
+
+    new_node->name = name;
+    new_node->num = num;
+    
+
+    if(mode){
+        last->son = new_node;
+
+        new_node->father = last;
+
+        return new_node;
+    }
+    else if(!mode){
+        if (head_ref == NULL){
+            
+            return new_node;
+        
+        }
+        
+        else
+        {
+            
+            while (last->next != NULL) last = last->next;
+
+            last->next = new_node;
+
+            new_node->prev = last;
+
+            return new_node;    
+        }
+        
+    }
 }
 
-struct Sums *insertSums(struct Sums *last, int new_data)
-{
-   if (last != NULL){
-      struct Sums *temp = new Sums;
-      temp -> data = new_data;
-      temp -> next = last -> next;
-      last -> next = temp;
-      last = temp;
-      return last;
-   }
-   else
-   {
-      struct Sums *temp = new Sums;
-      temp -> data = new_data;
-      last = temp;
-      last->next = last;  
-      return last;
-   }  
-}
-
-Sums* deleteSum(Sums* head)
-{
-   if (head == NULL) return head;
-   else if(head->next==head)
-   {
-       free(head);
-       head = NULL;
-       return head;
-   }
-   else
-   {
-
-      Sums *previous = head;
-      while (previous->next != head)
-      {
-         previous = previous->next;
-      }
-      previous->next = head->next;
-      delete head;
-      head = previous;
-      return head;
-   }
-}
-
-
-
-
-
-
-
-
-struct  Node
-{
-   string name;
-   int num;
-   Node* next;
-   Node* prev;
-};
-
-bool hasElementsNodeBool(struct Node *last)
-{  
-   if (last == NULL) return false;
-   return true;
-}
-
-struct Node *insertNode(struct Node *last,string name,int num)
-{
-   if (last != NULL){
-      struct Node *temp = new Node;
-      temp->name = name;
-      temp->num = num;
-      temp->next = last->next;
-      last->next->prev = temp;
-      last->next = temp;
-      temp->prev =last;
-      last = temp;
-      return last;
-   }
-   else
-   {
-      struct Node *temp = new Node;
-      temp->name = name;
-      temp->num = num;last = temp;
-      last->next = last;  
-      temp->prev = last;
-      return last;
-   }  
-}
-
-Node *deleteNode(Node* head)
-{
-   if (head == NULL) return head;
-   else if(head->next==head)
-   {
-       delete head;
-       head=NULL;
-       return head;
-   }
-   else
-   {
-
-      Node *previous = head->next;
-      head->prev->next = head->next;
-      head->next->prev = head->prev;
-      delete head; 
-      head = previous;
-      return head;
-   }
+Node* find(Node* tree, int i){
+    while (tree->next != NULL && tree->next->num != i)
+        {
+            tree = tree->next;
+        }
+    return tree;
 }
 
 
-
-
-
-
-
-
-struct  NodeOfNodes
-{
-   Node* dataNode;
-   NodeOfNodes* next;
-   NodeOfNodes* prev;
-};
-
-bool hasElementsNodeOfNodesBool(struct NodeOfNodes *last)
-{  
-   if (last == NULL) return false;
-   return true;
+Node* backToStart(Node* tree, int num){
+    for(int i = 0; i < num; i++){
+        while (tree->prev != NULL){
+            tree = tree->prev;
+        }
+        tree = tree->father;
+    }
+    return tree;
 }
 
-struct NodeOfNodes *insertNodeOfNodes(struct NodeOfNodes *last, Node* new_data)
-{
-   if (last != NULL){
-      struct NodeOfNodes *temp = new NodeOfNodes;
-      temp -> dataNode = new_data;
-      temp->next = last->next;
-      last->next->prev = temp;
-      last->next = temp;
-      temp->prev = last;
-      last = temp;
-      return last; 
+Node *makeTree(Node* tree, string name , int *instructuons, int numOfInstructions){
+    int stepDown;
+    int i = 0;
+    // if(tree->son == NULL){
+    //     tree = append(tree,name,num,1);
+    //     tree = tree->father;
+    // } // доделать 
+    
 
-   }
-   else
-   {
-      struct NodeOfNodes *temp = new NodeOfNodes;
-      temp -> dataNode = new_data;
-      last = temp;
-      last->next = last;  
-      temp->prev = last;
-      return last;
-   }  
+    
+    for(i; i < numOfInstructions; i++){
+        if(tree->num == 0){
+            if(tree->son != NULL) tree = tree->son;
+            else {
+                if(numOfInstructions == i + 1){
+                    tree = append(tree,name,instructuons[i],1);
+                    break;
+                }
+                else
+                {
+                    tree = append(tree,"X",instructuons[i],1);
+                    // i++;
+                }
+                
+            }
+        }
+        // bool hasSon = false;
+        // if(tree->son != NULL && !has) {
+        //     tree = tree->son;
+        //     hasSon = true;
+        // }
+
+        // смотрим код отсюда
+        tree = find(tree,instructuons[i]);
+            
+        
+        
+        
+        
+        
+        if(tree->next == NULL){
+            if(i + 1 == numOfInstructions){
+                tree = append(tree,name,instructuons[i],0);
+            }
+            else{
+                // tree = append(tree,"X",instructuons[i],0);
+                i++;
+                for(;i < numOfInstructions - 2;i++){
+                    tree = append(tree,"X",instructuons[i],1);
+                    i++;
+                }
+                tree = append(tree,name,instructuons[i],1);
+                i++;
+            }
+        }
+        else{
+            tree = tree->next;
+            if(i + 1 == numOfInstructions){
+                tree->name = name;
+                tree->num = instructuons[i];
+            }
+            else{
+                if(tree->son != NULL){
+                    tree = tree->son;
+                    // i++;
+                    // if(i + 1 == numOfInstructions){
+                    //     tree->name = name;
+                    //     tree->num = instructuons[i];
+                    // }
+                }
+                else{
+                    tree = append(tree,"X",instructuons[i+1],1);
+                    //i++ ?
+                }
+            } 
+        }
+        
+    }
+    tree = backToStart(tree,numOfInstructions);
+    return tree;
 }
 
-NodeOfNodes *deleteNodeOfNodes(NodeOfNodes* head)
-{
-   if (head == NULL) return head;
-   else if(head->next==head)
-   {
-       delete head;
-       head=NULL;
-       return head;
-   }
-   else
-   {
-      NodeOfNodes *previous = head->next;
-      head->prev->next = head->next;
-      head->next->prev = head->prev;
-      delete head; 
-      head = previous;
-      return head;
-   }
+
+Node *backToStartPos(struct Node *node,int num){
+    for(int i = 0; i < num;i++){
+        node = node->prev;
+    }
+    return node;
 }
 
 
 
+int main(){
+    Node *tree = new Node();
+    tree->son = NULL;
+    tree->father = NULL;
+    tree->name = "start";
+    tree->next = NULL;
+    tree->prev = NULL;
+    tree->num = 0;
+    
+    int numOfInstructions;
+    cin >> numOfInstructions;
+    for (int k = 0; k < numOfInstructions; k++){
+        
+        string instruction;
+        cin >> instruction;
+        // getline(cin,instruction);
 
+        int numOfTreeInstructions;
+        cin >> numOfTreeInstructions;
+        int* arrOfTreeInstructions = new int[numOfTreeInstructions];
 
+        for(int l = 0; l < numOfTreeInstructions; l++){
+            
+            cin >> arrOfTreeInstructions[l];
 
+        }
 
-
-struct NodeOfNodes *nodeOfNodesStep(NodeOfNodes* fullNode,int numOfSteps){
-   if (numOfSteps >= 0){
-      for(int j = 0;j < numOfSteps;j++){
-         fullNode = fullNode->next;
-      }
-   }
-   else
-   {
-      for(int j = 0;j < (numOfSteps * -1);j++){
-         fullNode = fullNode->prev;
-      }
-   }
-   return fullNode;
-}
-
-struct NodeOfNodes *nodeStep(NodeOfNodes* fullNode,int numOfSteps){
-   if (numOfSteps >= 0){
-      for(int j = 0;j < numOfSteps;j++){
-         fullNode->dataNode = fullNode->dataNode->next;
-      }
-   }
-   else
-   {
-      for(int j = 0;j < (numOfSteps * -1);j++){
-          fullNode->dataNode = fullNode->dataNode->prev;
-      }
-   }
-   return fullNode;
-}
-
-struct NodeOfNodes *prepareToOutput(NodeOfNodes* fullNode,int position){
-   for(int i = 0;i < position;i++){
-      fullNode = fullNode->prev;
-   }
-   return fullNode;
-}
-
-struct NodeOfNodes *backToNormalView(NodeOfNodes* fullNode,int position){
-   for(int i = 0;i < position;i++){
-      fullNode = fullNode->next;
-   }
-   return fullNode;
-}
-
-int currentSums(NodeOfNodes* fullNode,int *lengthOfNodeOfNodes ){
-   int sums = 0;
-   for(int i = 0;i < *lengthOfNodeOfNodes ;i++){
-      sums += fullNode->dataNode->num;
-      fullNode = fullNode->next;
-   }
-   return sums;
-}
-
-int placeOhHeadNode(int placeOfHead, int instruction, NodeOfNodes* fullNode,int *lengthOfNodeOfNodes ){
-   placeOfHead += instruction;
-   while (true){
-      if(placeOfHead > *lengthOfNodeOfNodes ){
-         placeOfHead -= *lengthOfNodeOfNodes ;
-      }
-      else break;       
-   }
-   return placeOfHead;
-}
-
-
-NodeOfNodes *deleteNullNode(NodeOfNodes* fullNode, int* placeOhHead,int *lengthOfNodeOfNodes ){
-   int delNums = 0;
-   for(int j = 0; j < *lengthOfNodeOfNodes;j++){
-      if(hasElementsNodeBool(fullNode->dataNode) == false){
-         if (j < *placeOhHead){
-
-            *placeOhHead = *placeOhHead - 1;
-         }
-         fullNode = deleteNodeOfNodes(fullNode); 
-         delNums++;
-         continue;
-      }
-      fullNode = fullNode->next;  
-   }
-   *lengthOfNodeOfNodes = *lengthOfNodeOfNodes - delNums;
-   return fullNode;
-}
-
-bool outputInstruction(NodeOfNodes* fullNode, Sums* sumy, int* placeOhHead,int *lengthOfSums,int *lengthOfNodeOfNodes ){
-   int sumNodeEls = currentSums(fullNode,lengthOfNodeOfNodes);
-   
-   for(int i = 0; i < *lengthOfSums;i++){
-      if(sumNodeEls == sumy->data){
-         
-         cout << sumy->data << " ";
-         sumy = deleteSum(sumy);
-         *lengthOfSums = *lengthOfSums - 1;
-         for(int j = 0; j < *lengthOfNodeOfNodes;j++){
-            cout << fullNode->dataNode->name << " ";
-            fullNode->dataNode = deleteNode(fullNode->dataNode);
-            fullNode = fullNode->next;
-         }
-
-         cout << "\n";
-         return true;
-      }
-   sumy = sumy->next;
-   }
-   return false;
-}
-
-
-
-
-
-void mechanicnyPomocnik(NodeOfNodes* fullNode,Sums* sumy,int numOfInstructions,int instructions[],int *lengthOfSums,int *lengthOfNodeOfNodes ){
-   int placeOfHead = 0;
-   for(int i = 0; i < numOfInstructions * 2;i++){
-
-      if (hasElementsNodeOfNodesBool(fullNode) == false){
-         break; // гдето тут ошиобчка 
-      }
-      else if(hasElementsSumsBool(sumy) == false)
-      {
-         break;
-      }
-
-
-
-
-      bool cont; 
-      fullNode = prepareToOutput(fullNode,placeOfHead);
-      cont = outputInstruction(fullNode,sumy,&placeOfHead,lengthOfSums,lengthOfNodeOfNodes);
-      fullNode = deleteNullNode(fullNode,&placeOfHead,lengthOfNodeOfNodes);
-      fullNode = backToNormalView(fullNode,placeOfHead);
-      
-      
-      fullNode = nodeOfNodesStep(fullNode,instructions[i]);
-
-      placeOfHead = placeOhHeadNode(placeOfHead,instructions[i],fullNode,lengthOfNodeOfNodes);
-
-      i++;
-      fullNode = nodeStep(fullNode,instructions[i]); 
-
-
-
-      
-      fullNode = prepareToOutput(fullNode,placeOfHead);
-
-
-      while(cont) {
-      cont = outputInstruction(fullNode,sumy,&placeOfHead,lengthOfSums,lengthOfNodeOfNodes);
-      fullNode = deleteNullNode(fullNode,&placeOfHead,lengthOfNodeOfNodes);
-      if(hasElementsNodeOfNodesBool(fullNode) == false) break;
-      }
-      
-      fullNode = backToNormalView(fullNode,placeOfHead);
-
-   }
-
-}
-
-
-
-int main()
-{
-   NodeOfNodes *fullNode = NULL;
-   int numOfNodes;
-   cin >> numOfNodes;
-   for(int i = 0; i < numOfNodes;i++){
-      Node *plantNode = NULL;
-      int numOfObjInPlantNode;
-      cin >> numOfObjInPlantNode;
-      string name;
-      int num;
-      for (int j = 0; j < numOfObjInPlantNode;j++){
-         cin >> name >> num;
-         plantNode = insertNode(plantNode,name,num);
-      }
-      plantNode = plantNode->next;
-      fullNode = insertNodeOfNodes(fullNode,plantNode);
-   }
-   fullNode = fullNode->next;
-   int numOfSums;
-   cin >> numOfSums;
-   Sums *sumy = NULL;
-   for(int i = 0; i < numOfSums;i++){
-      int resultFinal;
-      cin >> resultFinal;
-      sumy = insertSums(sumy,resultFinal); 
-   } 
-   sumy = sumy->next;
-
-
-
-   int numOfinstructions;
-   cin >> numOfinstructions;
-   int* instructions = new int[numOfinstructions*2];
-   for(int i = 0;i < numOfinstructions*2;i++){
-      cin >> instructions[i];
-   }
-   
-
-   mechanicnyPomocnik(fullNode,sumy,numOfinstructions,instructions,&numOfSums,&numOfNodes);
+        tree = makeTree(tree,instruction,arrOfTreeInstructions,numOfTreeInstructions);
+    }
+    cout << 1;
+    
 
 }
