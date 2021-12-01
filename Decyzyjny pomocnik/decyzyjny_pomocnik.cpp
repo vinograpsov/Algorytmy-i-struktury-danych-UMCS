@@ -1,5 +1,5 @@
 #include <iostream>
-#include <string>
+// #include <string>
 using namespace std;
 
 struct Node
@@ -54,16 +54,16 @@ Node *append(Node* head_ref, string name, int num, int mode) // with son - 1, wi
 }
 
 Node* find(Node* tree, int i){
-    while (tree->next != NULL && tree->next->num != i)
-        {
-            tree = tree->next;
-        }
+    while (tree->next != NULL && tree->num != i)
+    {
+        tree = tree->next;
+    }
     return tree;
 }
 
 
-Node* backToStart(Node* tree, int num){
-    for(int i = 0; i < num; i++){
+Node* backToStart(Node* tree){
+    while(tree->father != NULL || tree->prev !=NULL){
         while (tree->prev != NULL){
             tree = tree->prev;
         }
@@ -73,84 +73,41 @@ Node* backToStart(Node* tree, int num){
 }
 
 Node *makeTree(Node* tree, string name , int *instructuons, int numOfInstructions){
-    int stepDown;
-    int i = 0;
-    // if(tree->son == NULL){
-    //     tree = append(tree,name,num,1);
-    //     tree = tree->father;
-    // } // доделать 
-    
+    int previousInstruction = instructuons[0];
+    if(tree->num == 0 && tree->son != NULL) tree = tree->son; 
+    else if(numOfInstructions == 1) tree = append(tree,name,instructuons[0],1);
+    else tree = append(tree,"X",instructuons[0],1);
 
-    
-    for(i; i < numOfInstructions; i++){
-        if(tree->num == 0){
-            if(tree->son != NULL) tree = tree->son;
-            else {
-                if(numOfInstructions == i + 1){
-                    tree = append(tree,name,instructuons[i],1);
-                    break;
-                }
-                else
-                {
-                    tree = append(tree,"X",instructuons[i],1);
-                    // i++;
-                }
-                
-            }
-        }
-        // bool hasSon = false;
-        // if(tree->son != NULL && !has) {
-        //     tree = tree->son;
-        //     hasSon = true;
-        // }
 
-        // смотрим код отсюда
+    for(int i = 0;i < numOfInstructions; i++){
         tree = find(tree,instructuons[i]);
-            
-        
-        
-        
-        
-        
-        if(tree->next == NULL){
-            if(i + 1 == numOfInstructions){
-                tree = append(tree,name,instructuons[i],0);
-            }
-            else{
-                // tree = append(tree,"X",instructuons[i],0);
-                i++;
-                for(;i < numOfInstructions - 2;i++){
-                    tree = append(tree,"X",instructuons[i],1);
-                    i++;
-                }
-                tree = append(tree,name,instructuons[i],1);
-                i++;
-            }
-        }
-        else{
-            tree = tree->next;
-            if(i + 1 == numOfInstructions){
+        if(tree->num == instructuons[i]){
+            if(numOfInstructions == i +1){
                 tree->name = name;
                 tree->num = instructuons[i];
             }
-            else{
+            else
+            {
                 if(tree->son != NULL){
                     tree = tree->son;
-                    // i++;
-                    // if(i + 1 == numOfInstructions){
-                    //     tree->name = name;
-                    //     tree->num = instructuons[i];
-                    // }
                 }
                 else{
                     tree = append(tree,"X",instructuons[i+1],1);
-                    //i++ ?
                 }
-            } 
+            }
+            
         }
-        
+        else{
+            if(numOfInstructions == i + 1){
+                tree = append(tree,name,instructuons[i],0);
+            }
+            else {
+                tree = append(tree,"X",instructuons[i],0);
+                tree = append(tree,"X",instructuons[i+1],1);
+            }
+        }
     }
-    tree = backToStart(tree,numOfInstructions);
+    tree = backToStart(tree);
     return tree;
 }
 
@@ -190,10 +147,9 @@ int main(){
             cin >> arrOfTreeInstructions[l];
 
         }
-
         tree = makeTree(tree,instruction,arrOfTreeInstructions,numOfTreeInstructions);
     }
-    cout << 1;
+    cout << tree->son->next->next->name;
     
 
 }
