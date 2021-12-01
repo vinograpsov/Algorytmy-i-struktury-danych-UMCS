@@ -6,6 +6,7 @@ struct Node
 {
     string name;
     int num;
+    bool wasPrinted;
     Node *next = NULL;
     Node *prev = NULL;
     Node *son = NULL;
@@ -22,7 +23,7 @@ Node *append(Node* head_ref, string name, int num, int mode) // with son - 1, wi
 
     new_node->name = name;
     new_node->num = num;
-    
+    new_node->wasPrinted = 0;
 
     if(mode){
         last->son = new_node;
@@ -112,11 +113,24 @@ Node *makeTree(Node* tree, string name , int *instructuons, int numOfInstruction
 }
 
 
-Node *backToStartPos(struct Node *node,int num){
-    for(int i = 0; i < num;i++){
-        node = node->prev;
+
+void postorder(Node* tree){
+    if(tree->son != NULL) tree = tree->son;
+    while (true) // pridumat uslowije
+    {
+        if(tree->son != NULL && tree->son->wasPrinted != 1) tree = tree->son; // tut mb lomajetsia 
+        else if(tree->next == NULL && tree->wasPrinted == 1){
+            while(tree->prev != NULL) tree = tree->prev;
+            if(tree->father != 0 || tree->father != NULL) tree = tree->father; // mb tut lomajetsia 
+            else break; // это решение говнячее репеделать именно эта строка 
+        }
+        else {
+            cout << tree->name << "\n";
+            tree->wasPrinted = 1;
+            if(tree->next != NULL) tree = tree->next;
+        }
     }
-    return node;
+    
 }
 
 
@@ -149,7 +163,5 @@ int main(){
         }
         tree = makeTree(tree,instruction,arrOfTreeInstructions,numOfTreeInstructions);
     }
-    cout << tree->son->next->next->name;
-    
 
 }
