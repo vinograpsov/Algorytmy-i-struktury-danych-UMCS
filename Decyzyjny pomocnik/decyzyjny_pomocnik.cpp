@@ -1,5 +1,5 @@
 #include <iostream>
-// #include <string>
+#include <string>
 using namespace std;
 
 struct Node
@@ -122,12 +122,42 @@ void postorder(Node* tree){
         else if(tree->next == NULL && tree->wasPrinted == 1){
             while(tree->prev != NULL) tree = tree->prev;
             if(tree->father != 0 || tree->father != NULL) tree = tree->father; // mb tut lomajetsia 
-            else break; // это решение говнячее репеделать именно эта строка 
         }
         else {
             cout << tree->name << "\n";
             tree->wasPrinted = 1;
             if(tree->next != NULL) tree = tree->next;
+        }
+        if(tree->num == 0){
+            cout << "Stan spoczynku";
+            break;
+        }
+    }
+}
+
+
+void preorder(Node* tree){
+    cout << "Stan spoczynku" << "\n";
+    if(tree->son != NULL) tree = tree->son;
+    while (true)
+    {
+        if(tree->wasPrinted != 1) {
+            cout << tree->name << "\n";
+            tree->wasPrinted = 1;
+        }
+        if(tree->son != NULL && tree->son->wasPrinted != 1) tree = tree->son;
+
+        else if(tree->next == NULL && tree->wasPrinted == 1){
+            while(tree->prev != NULL) tree = tree->prev;
+            if(tree->father != 0 || tree->father != NULL) tree = tree->father; // mb tut lomajetsia 
+        }
+
+        else {
+            if(tree->next != NULL) tree = tree->next;
+        }
+
+        if(tree->num == 0){
+            break;
         }
     }
     
@@ -139,7 +169,7 @@ int main(){
     Node *tree = new Node();
     tree->son = NULL;
     tree->father = NULL;
-    tree->name = "start";
+    tree->name = "Stan spoczynku";
     tree->next = NULL;
     tree->prev = NULL;
     tree->num = 0;
@@ -150,7 +180,7 @@ int main(){
         
         string instruction;
         cin >> instruction;
-        // getline(cin,instruction);
+        //getline(cin,instruction);
 
         int numOfTreeInstructions;
         cin >> numOfTreeInstructions;
@@ -163,5 +193,13 @@ int main(){
         }
         tree = makeTree(tree,instruction,arrOfTreeInstructions,numOfTreeInstructions);
     }
-
+    
+    int outputType;
+    cin >> outputType;
+    if(outputType == 1){
+        preorder(tree);
+    }
+    else if( outputType == 2){
+        postorder(tree);
+    }
 }
