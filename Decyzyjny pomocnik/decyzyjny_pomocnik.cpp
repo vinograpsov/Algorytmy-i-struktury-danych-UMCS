@@ -173,14 +173,14 @@ int main(){
     tree->next = NULL;
     tree->prev = NULL;
     tree->num = 0;
-    
+    string instruction;
     int numOfInstructions;
+
     cin >> numOfInstructions;
     for (int k = 0; k < numOfInstructions; k++){
         
-        string instruction;
-        cin >> instruction;
-        //getline(cin,instruction);
+        cin.ignore();
+        getline(cin,instruction);
 
         int numOfTreeInstructions;
         cin >> numOfTreeInstructions;
