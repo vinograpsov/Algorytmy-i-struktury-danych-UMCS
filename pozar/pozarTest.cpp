@@ -197,8 +197,8 @@ int main(){
                 //считаем и добавляем токи выхода
                 if ((i == 0 || i == arrY - 1) && intSymbol == 1){
                     ExitPoint temp;
-                    temp.exit.x = j;
-                    temp.exit.y = i;
+                    temp.exit.x = i;
+                    temp.exit.y = j;
                     temp.fireStepCount = -1;
                     temp.manStepCount = -1;
                     exitPoints.insert(exitPoints.end(),temp);
@@ -206,8 +206,8 @@ int main(){
                 }
                 else if((j == 0 || j == arrX - 1) && intSymbol == 1){
                     ExitPoint temp;
-                    temp.exit.x = j;
-                    temp.exit.y = i;
+                    temp.exit.x = i;
+                    temp.exit.y = j;
                     temp.fireStepCount = -1;
                     temp.manStepCount = -1;
                     exitPoints.insert(exitPoints.end(),temp);
@@ -221,8 +221,8 @@ int main(){
                 // огонь будет равен хашу и добавляем огонь в свою точку 
                 else if(intSymbol == 3){
                     Point temp;
-                    temp.x = j;
-                    temp.y = i;
+                    temp.x = i;
+                    temp.y = j;
                     firePositions.insert(firePositions.end(),temp);
                     fireNum++;
                     maze[i][j] = 0;
@@ -230,8 +230,8 @@ int main(){
                 
                 // чувака записываем и принимает его положение за точку 
                 else if(intSymbol == 4){
-                    manPosition.x = j; // ??????
-                    manPosition.y = i; // ??????
+                    manPosition.x = i; // ??????
+                    manPosition.y = j; // ??????
                     maze[i][j] = 1;
                 }                 
                 
@@ -240,7 +240,12 @@ int main(){
         }
         Point source = {1, 1};
         Point dest = {1, 8};
-        cout << BFS(maze,manPosition,exitPoints[0].exit,arrY,arrX);
+        cout << manPosition.x << manPosition.y << "\n";
+        cout << exitPoints[0].exit.x << exitPoints[0].exit.y << "\n"; 
+        Point temp ;
+        temp.x = exitPoints[0].exit.x;
+        temp.y = exitPoints[0].exit.y;
+        cout << BFS(maze,manPosition,temp,arrY,arrX);
 
     } 
 }
