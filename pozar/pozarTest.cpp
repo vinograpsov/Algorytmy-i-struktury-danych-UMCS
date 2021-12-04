@@ -62,6 +62,7 @@ void testInp(int** arr,int arrY, int arrX){
     }
 }  
 
+
 void testBFS(bool** arr,int rows,int cols){
     for (int i = 0;i < rows;i++){
         for(int j = 0;j < cols;j++){
@@ -71,7 +72,84 @@ void testBFS(bool** arr,int rows,int cols){
     }
 }
 
+void makeFireArr(int** arr,vector<Point> firePoints, int numFirePoints){
+    for(int i = 0; i < numFirePoints; i++){
+        arr[firePoints[i].y][firePoints[i].x] = 1;
+    }
+}
 
+
+
+bool isValid(int row, int col,int arrY,int arrX)
+{
+    return (row >= 0) && (row < arrY) &&
+           (col >= 0) && (col < arrX);
+}
+ 
+
+int rowNum[] = {-1, 0, 0, 1};
+int colNum[] = {0, -1, 1, 0};
+ 
+
+
+int BFS(int** mat, Point src, Point dest, int arrY, int arrX)
+{
+    // check source and destination cell
+    // of the matrix have value 1
+    if (!mat[src.x][src.y] || !mat[dest.x][dest.y])
+        return -1;
+ 
+    bool** visited = new bool* [arrY];
+    for (int i = 0; i < arrY; i++){
+        visited[i] = new bool[arrX];;
+    }
+
+    for(int i = 0;i < arrY; i++){
+        for(int j = 0;j < arrX; j++){
+            visited[i][j] = false;
+        }
+    }
+
+    visited[src.x][src.y] = true;
+ 
+    queue<queueNode> q;
+     
+    queueNode s = {src, 0};
+    q.push(s);  
+ 
+    while (!q.empty())
+    {
+        queueNode curr = q.front();
+        Point pt = curr.pt;
+ 
+
+        if (pt.x == dest.x && pt.y == dest.y)
+            return curr.dist;
+
+        q.pop();
+ 
+        for (int i = 0; i < 4; i++)
+        {
+            int row = pt.x + rowNum[i];
+            int col = pt.y + colNum[i];
+
+            if (isValid(row, col,arrY,arrX) && mat[row][col] &&
+               !visited[row][col])
+            {
+                visited[row][col] = true;
+                queueNode Adjcell = { {row, col},curr.dist + 1 };
+                q.push(Adjcell);
+            }
+        
+        cout << "\n";
+        testBFS(visited,arrY,arrX);
+        cout << "\n";
+
+        }
+    }
+ 
+    return -1;
+}
 
 int main(){
     vector<int> answers;  
@@ -160,14 +238,9 @@ int main(){
    
             }   
         }
-        testInp(maze,arrY,arrX);
-        cout << manPosition.x << manPosition.y << "\n";
-        
-        cout << firePositions[0].x << firePositions[0].y << "\n";    
-        cout << firePositions[1].x << firePositions[1].y << "\n";
-    
-        cout << exitPoints[0].exit.x << exitPoints[0].exit.y << "\n";
-        cout << exitPoints[1].exit.x << exitPoints[1].exit.y << "\n";
+        Point source = {1, 1};
+        Point dest = {1, 8};
+        cout << BFS(maze,manPosition,exitPoints[0].exit,arrY,arrX);
 
     } 
 }
