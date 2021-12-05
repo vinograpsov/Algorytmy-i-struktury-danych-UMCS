@@ -261,21 +261,32 @@ int main(){
         }
         
         // считаем количество шагов для огня 
-
-
-        for(int i = 0;i < exitNum;i++){
-            for(int j = 0 ; j < fireNum;j++){
+        for(int i = 0 ; i < exitNum; i++){
+            for(int j = 0; j < fireNum; j++){
                 int temp = BFS(maze,firePositions[j],exitPoints[i].exit,arrY,arrX);
-                if(exitPoints[i].fireStepCount > temp || exitPoints[i].fireStepCount == -1) exitPoints[i].fireStepCount = temp;
+                if((exitPoints[i].fireStepCount > temp && temp != 1) || exitPoints[i].fireStepCount == -1) exitPoints[i].fireStepCount = temp;
             }
         }
+        
+        // for(int i = 0; i < exitNum; i++){
+        //     cout << exitPoints[i].fireStepCount << " " << exitPoints[i].manStepCount << "\n";
+        // }
 
-        int shortestWay = -1;
-        for(int i = 0; i < exitNum;i++){
-            if(exitPoints[i].fireStepCount > exitPoints[i].manStepCount || shortestWay == -1) shortestWay = exitPoints[i].manStepCount;
+        int shotrestWay = -1;
+        
+        
+        if(fireNum != 0){
+            for(int i = 0; i < exitNum; i++){
+                // cout << exitPoints[i].fireStepCount << " " << exitPoints[i].manStepCount << "\n";
+                if((exitPoints[i].fireStepCount > exitPoints[i].manStepCount && exitPoints[i].manStepCount != -1 && shotrestWay > exitPoints[i].manStepCount) || (shotrestWay == -1 && exitPoints[i].fireStepCount > exitPoints[i].manStepCount)) shotrestWay = exitPoints[i].manStepCount;
+                // cout << shotrestWay << "\n";
+            }
+        
+            answers.insert(answers.end(),shotrestWay);
         }
 
-        answers.insert(answers.end(),shortestWay);
+
+        
     } 
     // петля которая выводит ответы ечли -1 выписывает нет 
     for(int i = 0; i < numOfTests;i++){

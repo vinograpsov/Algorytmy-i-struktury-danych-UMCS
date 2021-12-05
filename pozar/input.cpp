@@ -140,16 +140,26 @@ int BFS(int** mat, Point src, Point dest, int arrY, int arrX)
                 queueNode Adjcell = { {row, col},curr.dist + 1 };
                 q.push(Adjcell);
             }
-        
-        cout << "\n";
-        testBFS(visited,arrY,arrX);
-        cout << "\n";
-
         }
     }
- 
     return -1;
 }
+
+
+
+
+void fireShortestWay(vector<Point> firePositions,vector<ExitPoint> exitPoints,int exitNum,int fireNum){
+
+}
+
+void mansShortestWay(Point manPosition,vector<ExitPoint> exitPoints,int exitNum, int** maze,int arrY,int arrX){
+    for(int i = 0; i < exitNum; i++){
+        exitPoints[i].manStepCount = BFS(maze,manPosition,exitPoints[i].exit,arrY,arrX);
+    }
+}
+
+
+
 
 int main(){
     vector<int> answers;  
@@ -197,8 +207,8 @@ int main(){
                 //считаем и добавляем токи выхода
                 if ((i == 0 || i == arrY - 1) && intSymbol == 1){
                     ExitPoint temp;
-                    temp.exit.x = j;
-                    temp.exit.y = i;
+                    temp.exit.x = i;
+                    temp.exit.y = j;
                     temp.fireStepCount = -1;
                     temp.manStepCount = -1;
                     exitPoints.insert(exitPoints.end(),temp);
@@ -206,8 +216,8 @@ int main(){
                 }
                 else if((j == 0 || j == arrX - 1) && intSymbol == 1){
                     ExitPoint temp;
-                    temp.exit.x = j;
-                    temp.exit.y = i;
+                    temp.exit.x = i;
+                    temp.exit.y = j;
                     temp.fireStepCount = -1;
                     temp.manStepCount = -1;
                     exitPoints.insert(exitPoints.end(),temp);
@@ -221,8 +231,8 @@ int main(){
                 // огонь будет равен хашу и добавляем огонь в свою точку 
                 else if(intSymbol == 3){
                     Point temp;
-                    temp.x = j;
-                    temp.y = i;
+                    temp.x = i;
+                    temp.y = j;
                     firePositions.insert(firePositions.end(),temp);
                     fireNum++;
                     maze[i][j] = 0;
@@ -230,23 +240,58 @@ int main(){
                 
                 // чувака записываем и принимает его положение за точку 
                 else if(intSymbol == 4){
-                    manPosition.x = j; // ??????
-                    manPosition.y = i; // ??????
+                    manPosition.x = i; // ??????
+                    manPosition.y = j; // ??????
                     maze[i][j] = 1;
                 }                 
                 
    
             }   
         }
-        Point source = {1, 1};
-        Point dest = {1, 8};
-        cout << manPosition.x << manPosition.y << "\n";
-        cout << exitPoints[0].exit.x << exitPoints[0].exit.y << "\n"; 
-        Point temp ;
-        temp.x = exitPoints[0].exit.x;
-        temp.y = exitPoints[0].exit.y;
-        cout << BFS(maze,manPosition,temp,arrY,arrX);
 
+
+        // считаем количество шагов мужика для каждаго выхода 
+        for(int i = 0; i < exitNum; i++){
+            exitPoints[i].manStepCount = BFS(maze,manPosition,exitPoints[i].exit,arrY,arrX);
+        }
+
+        // делаем табличку для огня 
+        for(int i = 0;i < fireNum;i++){
+            maze[firePositions[i].x][firePositions[i].y] = 1;
+        }
+        
+        // считаем количество шагов для огня 
+        for(int i = 0 ; i < exitNum; i++){
+            for(int j = 0; j < fireNum; j++){
+                int temp = BFS(maze,firePositions[j],exitPoints[i].exit,arrY,arrX);
+                if((exitPoints[i].fireStepCount > temp && temp != 1) || exitPoints[i].fireStepCount == -1) exitPoints[i].fireStepCount = temp;
+            }
+        }
+        
+        // for(int i = 0; i < exitNum; i++){
+        //     cout << exitPoints[i].fireStepCount << " " << exitPoints[i].manStepCount << "\n";
+        // }
+
+        int shotrestWay = -1;
+        
+        
+        if(fireNum != 0){
+            for(int i = 0; i < exitNum; i++){
+                // cout << exitPoints[i].fireStepCount << " " << exitPoints[i].manStepCount << "\n";
+                if((exitPoints[i].fireStepCount > exitPoints[i].manStepCount && exitPoints[i].manStepCount != -1 && shotrestWay > exitPoints[i].manStepCount) || (shotrestWay == -1 && exitPoints[i].fireStepCount > exitPoints[i].manStepCount)) shotrestWay = exitPoints[i].manStepCount;
+                // cout << shotrestWay << "\n";
+            }
+        
+            answers.insert(answers.end(),shotrestWay);
+        }
+
+
+        
     } 
+    // петля которая выводит ответы ечли -1 выписывает нет 
+    for(int i = 0; i < numOfTests;i++){
+        if(answers[i] == -1) cout << "NIE" << "\n";
+        else cout << answers[i] << "\n";
+    }
 }
     
