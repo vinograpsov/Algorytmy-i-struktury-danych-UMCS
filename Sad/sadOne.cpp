@@ -44,14 +44,16 @@ int main(){
             }
             else{
                 unsigned short int temp = 0;
-                for(int k = 0; k < 2; k++){
+                for(int k = j - 1; k < j + 2; k++){
                     if(temp < appleTrees[k]) temp = appleTrees[k];
                 }
                 appleTrees[j-1] = globalTemp;
                 globalTemp = temp + localTemp;
             }
+            cout << globalTemp << " ";
 
         }
+        cout << "\n";
     }
     
     
