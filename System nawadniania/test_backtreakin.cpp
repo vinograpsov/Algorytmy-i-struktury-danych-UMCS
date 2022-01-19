@@ -1,37 +1,37 @@
 #include <iostream>
 using namespace std;
 
-void printArr(int arr[4]){
-    for(int i = 0; i < 4; i++){
-        cout << arr[i] << " ";
-    }
-    cout << "\n";
-}
-
-void backTreaking(int** arr, int currentPos, int esteticsWeNeed, int currentEstetics, int size,int & money,int temp_money, int currentAttempt){
+void backTreaking(int** arr, int currentPos, int currentEstetics, int size,int & money,int temp_money, int currentAttempt){
         
-    if ((esteticsWeNeed == currentEstetics) && (currentAttempt != 0)){
+    if ((0 == currentEstetics) && (currentAttempt != 0)){
         if ((money > temp_money) || (money == -1)){
             money = temp_money;
+            temp_money = 0;
+            return;
         }
     }
+    // else{
+    currentAttempt += 1;
     for (int i = currentPos; i < size; i++)
     {
-        currentAttempt += 1;
-        if (currentEstetics + arr[0][i] <= esteticsWeNeed)
+        if ((money == -1)||(money > temp_money))
         {
             currentEstetics += arr[0][i];
             temp_money += arr[1][i];   
-            backTreaking(arr, i + 1, esteticsWeNeed, currentEstetics, size,money,temp_money,currentAttempt);
+            backTreaking(arr, i + 1, currentEstetics, size,money,temp_money,currentAttempt);
             temp_money -= arr[1][i];
             currentEstetics -= arr[0][i];
         }
     }
+    // }
 }
 
 
 int main(){
-
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    std::cout.tie(nullptr);
+    
     int countTests;
     cin >> countTests;
     int* answers = new int[countTests];
@@ -47,16 +47,13 @@ int main(){
         }
 
         int money = -1;
-        backTreaking(inputArr,0,0,0,4,money,0,0);
-        answers[t] = money;
-    }
-
-    for (int i = 0; i < countTests;i++){
-        if (answers[i] == -1){
+        backTreaking(inputArr,0,0,rowNum,money,0,0);
+        if (money == -1){
             cout << "NIE"<< "\n";
         }
         else{
-            cout << answers[i] << "\n";
+            cout << money << "\n";
         }
     }
+
 }
