@@ -3,27 +3,19 @@ using namespace std;
 
 void backTreaking(int** arr, int currentPos, int currentEstetics, int size,int & money,int temp_money, int currentAttempt){
         
-    if ((0 == currentEstetics) && (currentAttempt != 0)){
-        if ((money > temp_money) || (money == -1)){
-            money = temp_money;
-            temp_money = 0;
-            return;
-        }
+    if ((0 == currentEstetics) && (currentAttempt != 0) && ((money > temp_money) || (money == -1))){
+        money = temp_money;
+        return;
     }
-    // else{
+
     currentAttempt += 1;
     for (int i = currentPos; i < size; i++)
     {
         if ((money == -1)||(money > temp_money))
-        {
-            currentEstetics += arr[0][i];
-            temp_money += arr[1][i];   
-            backTreaking(arr, i + 1, currentEstetics, size,money,temp_money,currentAttempt);
-            temp_money -= arr[1][i];
-            currentEstetics -= arr[0][i];
+        { 
+            backTreaking(arr, i + 1, currentEstetics + arr[0][i], size,money,temp_money + arr[1][i],currentAttempt);
         }
-    }
-    // }
+    } 
 }
 
 
