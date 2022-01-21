@@ -30,6 +30,8 @@ int main(){
     for (int t = 0; t < countTests;t++){
         int rowNum;
         cin >> rowNum;
+        
+        
         int** inputArr = new int*[2];
         for(int i = 0; i < 2; ++i)
             inputArr[i] = new int[rowNum];

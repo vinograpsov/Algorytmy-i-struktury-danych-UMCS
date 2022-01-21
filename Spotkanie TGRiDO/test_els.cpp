@@ -2,12 +2,12 @@
 using namespace std;
 
 
-
 struct Person
 {
     int num;
     int points;
 };
+
 
 void printArr(Person* arr,int length){
     for(int i = 0; i < length; i++){
@@ -24,7 +24,6 @@ int _pow(int n, int k){ // need to test
     return temp;
 }
 
-
 int findParent(int pos){
     if (pos == 1) return 0;
     else if (pos % 2 == 1){
@@ -33,19 +32,17 @@ int findParent(int pos){
     return pos / 2 - 1;
 }
 
-
 bool sortOneEl(Person* arr, int pos){
     int ku = findParent(pos);
     if(pos != 0 && arr[pos].points > arr[ku].points){
         Person temp = arr[pos];
         arr[pos] = arr[ku];
         arr[ku] = temp;
-                printArr(arr,6);
+                // printArr(arr,6);
         return true;
     }   
     return false;
 }
-
 
 
 Person* firstArrSort(Person* arr, int length){
@@ -61,60 +58,20 @@ Person* firstArrSort(Person* arr, int length){
     return arr;
 }
 
-void kopiec(Person* arr, int length){
-    arr = firstArrSort(arr,length);
-}
-
-
 int main(){
-    int testNum;
-    cin >> testNum;
-    for(int i = 0; i < testNum; i++){
-        int numOfPeople;
-        cin >> numOfPeople;
-
-        Person* arr = new Person[numOfPeople];
-        Person temp;
-        for (int j = 0; j < numOfPeople; j++){
-            temp.num = j + 1;
-            cin >> temp.points;
-            arr[j] = temp;
-        }
-
-
-
-
-
+    int numOfPeople;
+    cin >> numOfPeople;
+    Person* arr = new Person[numOfPeople];
+    Person temp;
+    for (int j = 0; j < numOfPeople; j++){
+        temp.num = j + 1;
+        cin >> temp.points;
+        arr[j] = temp;
     }
+
+    printArr(arr,numOfPeople);
+    arr = firstArrSort(arr,numOfPeople);
+    printArr(arr,numOfPeople);
+
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-       // int* arr = new int[numOfPeople];
-        // for (int j = 0; j < numOfPeople; j++){
-        //     cin >> arr[j];
-        // } 
