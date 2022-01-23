@@ -16,7 +16,7 @@ void backTreaking(Point* arr, int currentPos, int currentEstetics, int size,int 
     }
    
     currentAttempt += 1;
-    for (int i = currentPos; (i < size) && ((money == -1)||(money > temp_money)); i++){
+    for (int i = currentPos;(arr[i].s != 0 && currentAttempt != 0) && (i < size) && ((money == -1)||(money > temp_money)); i++){ 
         backTreaking(arr, i + 1, currentEstetics + arr[i].s, size,money,temp_money + arr[i].c,currentAttempt);
     }     
 }
