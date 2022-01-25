@@ -7,18 +7,17 @@ struct Point
     int c;
 };
 
-
-void backTreaking(Point* arr, int currentPos, int currentEstetics, int size,int & money,int temp_money, int currentAttempt){
+void backTreaking(Point* arr, int currentPos, int currentEstetics, int size,int & money,int temp_money, bool currentAttempt){
         
-    if ((0 == currentEstetics) && (currentAttempt != 0) && ((money > temp_money) || (money == -1))){
+    if (((money > temp_money) || (money == -1)) && (currentAttempt != 0) && (0 == currentEstetics) ){
         money = temp_money;
         return;
     }
-   
-    currentAttempt += 1;
-    for (int i = currentPos;(arr[i].s != 0 && currentAttempt != 0) && (i < size) && ((money == -1)||(money > temp_money)); i++){ 
-        backTreaking(arr, i + 1, currentEstetics + arr[i].s, size,money,temp_money + arr[i].c,currentAttempt);
-    }     
+    else{
+        for (int i = currentPos; (i < size) && ((money == -1)||(money > temp_money)); i++){
+            backTreaking(arr, i + 1, currentEstetics + arr[i].s, size,money,temp_money + arr[i].c,true);
+        }    
+    } 
 }
 
 
@@ -41,7 +40,7 @@ int main(){
         }
 
         int money = -1;
-        backTreaking(inputArr,0,0,rowNum,money,0,0);
+        backTreaking(inputArr,0,0,rowNum,money,0,false);
         
         if (money == -1){
             cout << "NIE"<< "\n";
