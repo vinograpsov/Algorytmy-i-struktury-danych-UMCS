@@ -23,6 +23,10 @@ int findParent(int pos){
     return pos / 2 - 1;
 }
 
+int getLeftChild(int pos){
+    return pos * 2 + 1;
+}
+
 bool sortOneEl(vector<Person>& arr, int pos){
     int ku = findParent(pos);
     if((pos != 0 && arr[pos].points > arr[ku].points) || (arr[pos].points == arr[ku].points && arr[pos].num < arr[ku].num)){
@@ -35,7 +39,7 @@ bool sortOneEl(vector<Person>& arr, int pos){
 }
 
 
-void arrSort(vector<Person>& arr){
+void arrUpSort(vector<Person>& arr){
     int length = arr.size();
     for (int i = 1; i < length; i++){
         bool contin = true;
@@ -47,6 +51,45 @@ void arrSort(vector<Person>& arr){
         }
     }
 }
+
+
+void arrUpElSort(vector<Person>& arr){ // up el
+    int length = arr.size();
+    bool contin = true;
+    for (int i = 0; contin;){
+        int leftC = getLeftChild(i);
+        int rigthC = leftC + 1;
+        if(leftC <= length - 1){
+            if(rigthC <= length - 1){
+                if((arr[leftC].points > arr[rigthC].points) || (arr[leftC].points == arr[rigthC].points && arr[leftC].num < arr[rigthC].num)){
+                    contin = sortOneEl(arr,leftC);
+                    i = leftC;
+                }
+                else{
+                    contin = sortOneEl(arr,rigthC);
+                    i = rigthC;
+                }
+            }
+            else{
+                contin = sortOneEl(arr,leftC);
+                i = leftC;
+            }
+        }
+        else{
+            contin = false;
+        }
+    }
+}
+
+void arrDownSort(vector<Person>& arr){ // last el
+    int length = arr.size();
+    bool contin = true;
+    for (int i = length - 1;contin;){
+        contin = sortOneEl(arr,i);
+        i = findParent(i);
+    }
+}
+
 
 bool check_if_work(vector<Person>& arr){
     int length = arr.size();
@@ -71,27 +114,40 @@ void delLastZeros(vector<Person>& arr){
 
 void kopiec(vector<Person> arr, int length){
     vector<Point> answers;
-    arrSort(arr);
+
+    vector<Person> tempA;
+    for(int i = 0; i < length; i++){
+        tempA.push_back(arr[i]);
+        arrDownSort(tempA);
+    }
+
+    for(int i = 0; i < length;i++){
+        arr[i] = tempA[i];
+    }
     delLastZeros(arr);
     bool ku = check_if_work(arr);
     while (ku)
     {
+        int length = arr.size();
         Person first;
         Person second;
         
         first = arr[0];
         arr[0] = arr[arr.size() - 1];
         arr.pop_back();
-        arrSort(arr);
+        arrUpElSort(arr);
+        length--;
 
         second = arr[0];
-        if(arr.size() == 1){
+        if(length == 1){
             arr.pop_back();
+            length--;
         }
         else{
-            arr[0] = arr[arr.size() - 1];
+            arr[0] = arr[length - 1];
             arr.pop_back();
-            arrSort(arr);
+            arrUpElSort(arr);
+            length--;
         }
 
         Point temp;
@@ -108,23 +164,23 @@ void kopiec(vector<Person> arr, int length){
         }
         else if(first.points != 0 && second.points == 0){
             arr.push_back(first);
-            arrSort(arr);
+            arrDownSort(arr);
             delLastZeros(arr);
             ku = check_if_work(arr);
         }
         else if(first.points == 0 && second.points != 0){
             arr.push_back(second);
-            arrSort(arr);
+            arrDownSort(arr);
             delLastZeros(arr);
             ku = check_if_work(arr);
         }
         else{
             arr.push_back(first);
-            arrSort(arr);
+            arrDownSort(arr);
             delLastZeros(arr);
 
             arr.push_back(second);
-            arrSort(arr);
+            arrDownSort(arr);
             delLastZeros(arr);
             ku = check_if_work(arr);
         }
@@ -157,10 +213,6 @@ int main(){
             cin >> temp.points;
             arr.push_back(temp);
         }
-
-
         kopiec(arr,numOfPeople);
-
-
     }
 }

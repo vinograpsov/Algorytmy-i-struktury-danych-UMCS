@@ -23,51 +23,16 @@ void printA(vector<Person> arr){
     cout << "--------------------" << "\n";
 }
 
-void printArr(vector<Person> arr, int length){
-    for(int i = 0; i < length; i++){
-        cout << arr[i].num << " "  << arr[i].points << "\n";
-    }
-    cout << "\n";
-}
-
-int _pow(int n, int k){ // need to test
-    int temp = n;
-    for (int i = 0; i < k - 1; i++){
-        temp *= n;
-    }
-    return temp;
-}
-
 int findParent(int pos){
-    if (pos == 1) return 0;
-    else if (pos % 2 == 1){
+    if (pos % 2 == 1){
         return (pos - 1) / 2;
     }
+    else if (pos == 1) return 0;
     return pos / 2 - 1;
 }
 
-bool sortOneEl(vector<Person>& arr, int pos){
-    int ku = findParent(pos);
-    if((pos != 0 && arr[pos].points > arr[ku].points) || (arr[pos].points == arr[ku].points && arr[pos].num < arr[ku].num)){
-        Person temp = arr[pos];
-        arr[pos] = arr[ku];
-        arr[ku] = temp;
-        return true;
-    }   
-    return false;
-}
-
-
-void arrSort(vector<Person>& arr, int length){
-    for (int i = 1; i < length; i++){
-        bool contin = true;
-        int temp_pos = i;
-        while (contin)
-        {
-            contin = sortOneEl(arr,temp_pos);
-            temp_pos = findParent(temp_pos);
-        }
-    }
+int getLeftChild(int pos){
+    return pos * 2 + 1;
 }
 
 bool check_if_work(vector<Person>& arr){
@@ -82,7 +47,6 @@ bool check_if_work(vector<Person>& arr){
 }
 
 void delLastZeros(vector<Person>& arr){
-    // remove(arr.begin(),arr.end(),0);
     int length = arr.size();
     for (int i = length - 1; i >= 0; i--){
         if (arr[i].points == 0) arr.pop_back();
@@ -90,33 +54,89 @@ void delLastZeros(vector<Person>& arr){
     }
 }
 
+void upS(vector<Person>& arr, int pos){
+    int par = findParent(pos);
+    if((pos != 0 && arr[pos].points > arr[par].points) || (arr[pos].points == arr[par].points && arr[pos].num < arr[par].num)){
+        Person temp = arr[pos];
+        arr[pos] = arr[par];
+        arr[par] = temp;
+        upS(arr,par);
+    }   
+}
+
+void downS(vector<Person>& arr, int pos){
+    int leftC = getLeftChild(pos);
+    int rightC = leftC + 1;
+    int length = arr.size();
+    if(rightC == length){
+        if((arr[pos].points < arr[leftC].points) || (arr[pos].points == arr[leftC].points && arr[pos].num > arr[leftC].num)){
+            Person temp = arr[pos];
+            arr[pos] = arr[leftC];
+            arr[leftC] = temp;
+        }
+    }
+
+    else if(rightC <= length - 1){
+        bool is_left = true;
+        if (((arr[leftC].num > arr[rightC].num) && arr[leftC].points == arr[rightC].points) || (arr[leftC].points < arr[rightC].points) ) is_left = false; // ??????
+        if(((arr[pos].points < arr[leftC].points) || (arr[pos].points == arr[leftC].points && arr[pos].num > arr[leftC].num)) && is_left){
+            Person temp = arr[pos];
+            arr[pos] = arr[leftC];
+            arr[leftC] = temp;
+            downS(arr,leftC);
+        }
+        
+        else if((arr[pos].points < arr[rightC].points) || (arr[pos].points == arr[rightC].points && arr[pos].num > arr[rightC].num)){
+            Person temp = arr[pos];
+            arr[pos] = arr[rightC];
+            arr[rightC] = temp;
+            downS(arr,rightC);
+        }
+    }
+}
+
+
 
 
 void kopiec(vector<Person> arr, int length){
+    
     vector<Point> answers;
-    arrSort(arr,arr.size());
+    vector<Person> tempA;
+
+    for(int i = 0; i < length; i++){
+        tempA.push_back(arr[i]);
+        upS(tempA,i);
+    }
+
+    for(int i = 0; i < length; i++){
+        arr[i] = tempA[i];
+    }
     delLastZeros(arr);
-    printA(arr);
     bool ku = check_if_work(arr);
     while (ku)
     {
+        int length = arr.size();
         Person first;
         Person second;
         
         first = arr[0];
         arr[0] = arr[arr.size() - 1];
         arr.pop_back();
-        arrSort(arr,arr.size());
-
+        downS(arr,0);
+        length--;
+    
         second = arr[0];
-        if(arr.size() == 1){
+        if(length == 1){
             arr.pop_back();
+            length--;
         }
         else{
-            arr[0] = arr[arr.size() - 1];
+            arr[0] = arr[length - 1];
             arr.pop_back();
-            arrSort(arr,arr.size());
+            downS(arr,0);
+            length--;
         }
+    
 
         Point temp;
         temp.first = first.num;
@@ -132,29 +152,32 @@ void kopiec(vector<Person> arr, int length){
         }
         else if(first.points != 0 && second.points == 0){
             arr.push_back(first);
-            arrSort(arr,arr.size());
+            upS(arr,length);
             delLastZeros(arr);
             ku = check_if_work(arr);
         }
         else if(first.points == 0 && second.points != 0){
             arr.push_back(second);
-            arrSort(arr,arr.size());
+            upS(arr,length);
             delLastZeros(arr);
             ku = check_if_work(arr);
         }
         else{
             arr.push_back(first);
-            arrSort(arr,arr.size());
+            upS(arr,length);
             delLastZeros(arr);
 
             arr.push_back(second);
-            arrSort(arr,arr.size());
+            upS(arr,length + 1);
             delLastZeros(arr);
             ku = check_if_work(arr);
         }
+        
 
-    }
     
+    
+    }
+
     int lengthA = answers.size(); 
     cout << lengthA << "\n";
     for(int i = 0; i < lengthA; i++){
@@ -165,13 +188,10 @@ void kopiec(vector<Person> arr, int length){
             cout << answers[i].first << " " <<answers[i].second << "\n";
         }
     }
-
 }
 
+
 int main(){
-    std::ios_base::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-    std::cout.tie(nullptr);
     int testNum;
     cin >> testNum;
     for(int i = 0; i < testNum; i++){
@@ -187,7 +207,5 @@ int main(){
 
 
         kopiec(arr,numOfPeople);
-
-
     }
 }
