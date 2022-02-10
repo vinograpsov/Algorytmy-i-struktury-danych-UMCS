@@ -23,7 +23,7 @@ void lcd_wait_while_busy();
 void lcd_cmd(unsigned char);
 void lcd_data(unsigned char);
 void lcd_chage(unsigned char state);
-unsigned char mat_keybord(unsigned char num_state);
+void mat_keybord(unsigned char *num_state);
 
 
 
@@ -48,7 +48,7 @@ void main(){
 	lcd_chage(num_state);
 	while (1)
 	{
-		mat_keybord(num_state);
+		mat_keybord(&num_state);
 	}
 	
 }
@@ -57,7 +57,7 @@ void main(){
 
 
 
- void mat_keybord(unsigned char num_state){
+ void mat_keybord(unsigned char *num_state){
 	unsigned char i = 0; 
     unsigned char key;//zmienna w której trzymam wciœniêty klawisz klawiatury matrycowej    
 	key = *CSKB1;
@@ -70,137 +70,127 @@ void main(){
 		//ENTER
        	if(key == 0b01111111 ){
     		PRESS = 1;
-			if(num_state == 1){
-				num_state = 11;
-				lcd_chage(num_state);
-				return num_state;
+			if(*num_state == 1){
+				*num_state = 11;
+				lcd_chage(*num_state);
+				
 			}
-			else if(num_state == 2){
-				num_state = 21;
-				lcd_chage(num_state);
-				return num_state;
+			else if(*num_state == 2){
+				*num_state = 21;
+				lcd_chage(*num_state);
+				
 			}
-			else if (num_state ==11){
-				return num_state;
+			else if (*num_state ==11){
+				
 			}
-			else if(num_state ==12){
-				return num_state;
+			else if(*num_state ==12){
+				
 			}
-			else if(num_state ==21){
+			else if(*num_state ==21){
 				// num_state = 22; потом поменять
 				// lcd_chage(num_state);
-				return num_state;
+				
 			}
-			else if(num_state ==22){
-				return num_state;
+			else if(*num_state ==22){
+				
 			}
 		}
 		//UP
        	if(key == 0b11101111 ){
     		PRESS = 1;
-			if(num_state == 1){
-				num_state = 2;
-				lcd_chage(num_state);
-				return num_state;
+			if(*num_state == 1){
+				*num_state = 2;
+				lcd_chage(*num_state);
+				
 			}
-			else if(num_state == 2){
-				num_state = 1;
-				lcd_chage(num_state);
-				return num_state;
+			else if(*num_state == 2){
+				*num_state = 1;
+				lcd_chage(*num_state);
+				
 			}
-			else if (num_state ==11){
-				num_state = 12;
-				lcd_chage(num_state);
-				return num_state;
+			else if (*num_state ==11){
+				*num_state = 12;
+				lcd_chage(*num_state);
+				
 			}
-			else if(num_state ==12){
-				num_state = 11;
-				lcd_chage(num_state);
-				return num_state;
+			else if(*num_state ==12){
+				*num_state = 11;
+				lcd_chage(*num_state);
+				
 			}
-			else if(num_state ==21){
-				num_state = 22;
-				lcd_chage(num_state);
-				return num_state;
+			else if(*num_state ==21){
+				*num_state = 22;
+				lcd_chage(*num_state);
+				
 			}
-			else if(num_state ==22){
-				num_state = 21;
-				lcd_chage(num_state);
-				return num_state;
-			}
-			
-			
+			else if(*num_state ==22){
+				*num_state = 21;
+				lcd_chage(*num_state);
+				
+			}	
     	}
 		//DOWN
     	if(key == 0b11011111 ){
     		PRESS = 1;
-			if(num_state == 1){
-				num_state = 2;
-				lcd_chage(num_state);
-				return num_state;
+			if(*num_state == 1){
+				*num_state = 2;
+				lcd_chage(*num_state);
+				
 			}
-			else if(num_state == 2){
-				num_state = 1;
-				lcd_chage(num_state);
-				return num_state;
+			else if(*num_state == 2){
+				*num_state = 1;
+				lcd_chage(*num_state);
+				
 			}
-			else if (num_state ==11){
-				num_state = 12;
-				lcd_chage(num_state);
-				return num_state;
+			else if (*num_state ==11){
+				*num_state = 12;
+				lcd_chage(*num_state);
+				
 			}
-			else if(num_state ==12){
-				num_state = 11;
-				lcd_chage(num_state);
-				return num_state;
+			else if(*num_state ==12){
+				*num_state = 11;
+				lcd_chage(*num_state);
+				
 			}
-			else if(num_state ==21){
-				num_state = 22;
-				lcd_chage(num_state);
-				return num_state;
+			else if(*num_state ==21){
+				*num_state = 22;
+				lcd_chage(*num_state);
+				
 			}
-			else if(num_state ==22){
-				num_state = 21;
-				lcd_chage(num_state);
-				return num_state;
+			else if(*num_state ==22){
+				*num_state = 21;
+				lcd_chage(*num_state);
+				
 			}
     	}
-		// //LEFT
-   		// if(key == 0b11111011 ){
-		// 	PRESS = 1;
-		// }
-		// //RIGHT
-		// if(key == 0b11110111){
-  		// 	PRESS = 1;
-  		// }
 		//ESC
         if(key == 0b10111111){
 			PRESS = 1;
-			if(num_state == 1){
-				return num_state;
+			if(*num_state == 1){
+				
 			}
-			else if(num_state == 2){
-				return num_state;
+			else if(*num_state == 2){
+				
 			}
-			else if (num_state ==11){
-				num_state = 1;
-				lcd_chage(num_state);
-				return num_state;
+			else if (*num_state ==11){
+				*num_state = 1;
+				lcd_chage(*num_state);
+				
 			}
-			else if(num_state ==12){
-				num_state = 1;
-				lcd_chage(num_state);
-				return num_state;
+			else if(*num_state ==12){
+				*num_state = 1;
+				lcd_chage(*num_state);
+				
 			}
-			else if(num_state ==21){
-				num_state = 2;
-				lcd_chage(num_state);
-				return num_state;
+			else if(*num_state ==21){
+				*num_state = 2;
+				lcd_chage(*num_state);
+				
 			}
-			else if(num_state ==22){
-				num_state = 2;
-				lcd_chage(num_state);
-				return num_state;
+			else if(*num_state ==22){
+				*num_state = 2;
+				lcd_chage(*num_state);
+				
 			}
 		}
 	}                                 
