@@ -3,6 +3,8 @@
 #define FALSE 0
 #define TRUE 1
 
+unsigned char PRESS = 0; 
+
 __sbit __at (0x96) SEG_OFF;
 __sbit __at (0x97) TLED;
 __sbit __at (0xB5) KBD;
@@ -13,12 +15,15 @@ __xdata unsigned char * LCDWC = (__xdata unsigned char *) 0xFF80;
 __xdata unsigned char * LCDWD = (__xdata unsigned char *) 0xFF81;  
 __xdata unsigned char * LCDRC = (__xdata unsigned char *) 0xFF82; 
 
+
+
+
 void lcd_init();
 void lcd_wait_while_busy();
 void lcd_cmd(unsigned char);
 void lcd_data(unsigned char);
 void lcd_chage(unsigned char state);
-
+unsigned char mat_keybord(unsigned char num_state);
 
 
 
@@ -35,6 +40,175 @@ __code unsigned char sel_start[] = {'>','1','.','1',' ','S','T','A','R','T','\0'
 __code unsigned char sel_stop[] = {'>','1','.','2',' ','S','T','O','P','\0'};
 __code unsigned char sel_pwn_line[] = {'>','2','.','2',' ','P','W','M', '\0'};
 __code unsigned char sel_reset[] = {'>','2','.','2',' ','R','E','S','E','T', '\0'};
+
+
+
+void main(){
+	unsigned char num_state = 1;
+	lcd_chage(num_state);
+	while (1)
+	{
+		mat_keybord(num_state);
+	}
+	
+}
+
+
+
+
+
+ void mat_keybord(unsigned char num_state){
+	unsigned char i = 0; 
+    unsigned char key;//zmienna w której trzymam wciœniêty klawisz klawiatury matrycowej    
+	key = *CSKB1;
+	
+	if(key == 0b11111111 && PRESS == 1){
+		PRESS = 0;
+	}
+	
+	else if (PRESS == 0){
+		//ENTER
+       	if(key == 0b01111111 ){
+    		PRESS = 1;
+			if(num_state == 1){
+				num_state = 11;
+				lcd_chage(num_state);
+				return num_state;
+			}
+			else if(num_state == 2){
+				num_state = 21;
+				lcd_chage(num_state);
+				return num_state;
+			}
+			else if (num_state ==11){
+				return num_state;
+			}
+			else if(num_state ==12){
+				return num_state;
+			}
+			else if(num_state ==21){
+				// num_state = 22; потом поменять
+				// lcd_chage(num_state);
+				return num_state;
+			}
+			else if(num_state ==22){
+				return num_state;
+			}
+		}
+		//UP
+       	if(key == 0b11101111 ){
+    		PRESS = 1;
+			if(num_state == 1){
+				num_state = 2;
+				lcd_chage(num_state);
+				return num_state;
+			}
+			else if(num_state == 2){
+				num_state = 1;
+				lcd_chage(num_state);
+				return num_state;
+			}
+			else if (num_state ==11){
+				num_state = 12;
+				lcd_chage(num_state);
+				return num_state;
+			}
+			else if(num_state ==12){
+				num_state = 11;
+				lcd_chage(num_state);
+				return num_state;
+			}
+			else if(num_state ==21){
+				num_state = 22;
+				lcd_chage(num_state);
+				return num_state;
+			}
+			else if(num_state ==22){
+				num_state = 21;
+				lcd_chage(num_state);
+				return num_state;
+			}
+			
+			
+    	}
+		//DOWN
+    	if(key == 0b11011111 ){
+    		PRESS = 1;
+			if(num_state == 1){
+				num_state = 2;
+				lcd_chage(num_state);
+				return num_state;
+			}
+			else if(num_state == 2){
+				num_state = 1;
+				lcd_chage(num_state);
+				return num_state;
+			}
+			else if (num_state ==11){
+				num_state = 12;
+				lcd_chage(num_state);
+				return num_state;
+			}
+			else if(num_state ==12){
+				num_state = 11;
+				lcd_chage(num_state);
+				return num_state;
+			}
+			else if(num_state ==21){
+				num_state = 22;
+				lcd_chage(num_state);
+				return num_state;
+			}
+			else if(num_state ==22){
+				num_state = 21;
+				lcd_chage(num_state);
+				return num_state;
+			}
+    	}
+		// //LEFT
+   		// if(key == 0b11111011 ){
+		// 	PRESS = 1;
+		// }
+		// //RIGHT
+		// if(key == 0b11110111){
+  		// 	PRESS = 1;
+  		// }
+		//ESC
+        if(key == 0b10111111){
+			PRESS = 1;
+			if(num_state == 1){
+				return num_state;
+			}
+			else if(num_state == 2){
+				return num_state;
+			}
+			else if (num_state ==11){
+				num_state = 1;
+				lcd_chage(num_state);
+				return num_state;
+			}
+			else if(num_state ==12){
+				num_state = 1;
+				lcd_chage(num_state);
+				return num_state;
+			}
+			else if(num_state ==21){
+				num_state = 2;
+				lcd_chage(num_state);
+				return num_state;
+			}
+			else if(num_state ==22){
+				num_state = 2;
+				lcd_chage(num_state);
+				return num_state;
+			}
+		}
+	}                                 
+}
+
+
+
+
 
 
 
@@ -58,16 +232,6 @@ void lcd_init(){
 	lcd_cmd(0b00000110);
 	lcd_cmd(0b00000001);
 }
-
-
-void main(){
-    lcd_chage(1);
-    while(1){
-    }
-}
-
-
-
 
 
 void lcd_chage(unsigned char num_state){
