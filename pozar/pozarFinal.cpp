@@ -133,8 +133,7 @@ int BFS(int** mat, Point src, Point dest, int arrY, int arrX)
             int row = pt.x + rowNum[i];
             int col = pt.y + colNum[i];
 
-            if (isValid(row, col,arrY,arrX) && mat[row][col] &&
-               !visited[row][col])
+            if (isValid(row, col,arrY,arrX) && mat[row][col] && !visited[row][col])
             {
                 visited[row][col] = true;
                 queueNode Adjcell = { {row, col},curr.dist + 1 };
@@ -167,6 +166,10 @@ bool manDefendedFromFire(Point manPosition,vector<Point> firePositions,int arrY,
 }
 
 int main(){
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    std::cout.tie(nullptr);
+    
     vector<int> answers;  
 
     // получаем количество тестов
@@ -277,14 +280,14 @@ int main(){
 
         if(fireNum == 0){
             for(int i = 0; i < exitNum; i++){
-                if((exitPoints[i].manStepCount > shotrestWay && shotrestWay != -1) || (shotrestWay == -1 && exitPoints[i].manStepCount != -1)) shotrestWay = exitPoints[i].manStepCount;
+                if((exitPoints[i].manStepCount < shotrestWay && shotrestWay != -1) || (shotrestWay == -1 && exitPoints[i].manStepCount != -1)) shotrestWay = exitPoints[i].manStepCount;
             }
             answers.insert(answers.end(),shotrestWay);
         }
 
         else if(manDefendedFromFire(manPosition,firePositions,arrY,arrX,maze,fireNum)){
             for(int i = 0; i < exitNum; i++){
-                if((exitPoints[i].manStepCount > shotrestWay && shotrestWay != -1) || (shotrestWay == -1 && exitPoints[i].manStepCount != -1)) shotrestWay = exitPoints[i].manStepCount;
+                if((exitPoints[i].manStepCount < shotrestWay && shotrestWay != -1) || (shotrestWay == -1 && exitPoints[i].manStepCount != -1)) shotrestWay = exitPoints[i].manStepCount;
             }
             answers.insert(answers.end(),shotrestWay);
         }
@@ -305,4 +308,3 @@ int main(){
         else cout << answers[i] + 1 << "\n";
     }
 }
-    

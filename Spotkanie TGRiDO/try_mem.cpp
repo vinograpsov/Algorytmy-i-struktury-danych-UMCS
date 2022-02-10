@@ -1,4 +1,4 @@
-#include <iostream>
+#include <cstdio>
 #include <vector>
 using namespace std;
 
@@ -150,32 +150,29 @@ void kopiec(vector<Person> arr, int length){
     }
     
     int lengthA = answers.size(); 
-    cout << lengthA << "\n";
+    printf("%i\n",lengthA);
     for(int i = 0; i < lengthA; i++){
         if( answers[i].first > answers[i].second){
-            cout << answers[i].second << " " <<answers[i].first << "\n";
+            printf("%i %i\n",answers[i].second,answers[i].first );
         }
         else{
-            cout << answers[i].first << " " <<answers[i].second << "\n";
+            printf("%i %i\n",answers[i].first,answers[i].second);
         }
     }
 
 }
 
 int main(){
-    std::ios_base::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-    std::cout.tie(nullptr);
     int testNum;
-    cin >> testNum;
+    scanf("%i",testNum);
     for(int i = 0; i < testNum; i++){
         int numOfPeople;
-        cin >> numOfPeople;
+        scanf("%n",numOfPeople);
         vector<Person> arr;
         Person temp;
         for (int j = 0; j < numOfPeople; j++){
             temp.num = j + 1;
-            cin >> temp.points;
+            scanf("%i",temp.points);
             arr.push_back(temp);
             arrDownToUpSort(arr,arr.size(),j);
         }
