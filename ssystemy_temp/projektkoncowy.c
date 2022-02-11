@@ -95,7 +95,7 @@ void main(){
 	while (1)
 	{
 		
-		mul_keybord();
+		// mul_keybord();
 		
 		mat_keybord(&num_state);
 	}
@@ -116,17 +116,30 @@ void main(){
 //     *(CS55D) = 0x80;
 // }
 
+
+
 void mat_keybord(unsigned char *num_state){
 	unsigned char i = 0; 
     unsigned char key = *CSKB1;		
 	unsigned char key2 = 0b000000;
- 	
+ 		
+		 for (i = 0; i < 6; ++i){
+         	*CSDS = MUL[i];
+			if (KBD == 1){
+				key2 = MUL[i];
+				break;
+			}
+		}
 	if(key == 0b11111111 && key2 == 0b000000 && PRESS == 1){
 		PRESS = 0;
 	}
-	
+
 	else if (PRESS == 0){
 		//ENTER
+		if(key2 == MUL[0]){
+        			TLED = !TLED;
+        			PRESS = 1;
+			}
        	if(key == 0b01111111 ){
     		PRESS = 1;
 			if(*num_state == 1){
@@ -154,7 +167,21 @@ void mat_keybord(unsigned char *num_state){
 				
 			}
 		}
+		//LEFT
+           		if(key2 == MUL[5]){
+        			TLED = !TLED;
+        			PRESS = 1;
+        		}
+				//RIGHT
+			if(key2 == MUL[2]){
+        		TLED = !TLED;
+        		PRESS = 1;
+        	}
 		//UP
+		if(key2 == MUL[3]){
+        		TLED = !TLED;
+        		PRESS = 1;
+        	}
        	if(key == 0b11101111 ){
     		PRESS = 1;
 			if(*num_state == 1){
@@ -189,6 +216,10 @@ void mat_keybord(unsigned char *num_state){
 			}	
     	}
 		//DOWN
+		if(key2 == MUL[4]){
+        			TLED = !TLED;
+        			PRESS = 1;
+        		}
     	if(key == 0b11011111 ){
     		PRESS = 1;
 			if(*num_state == 1){
@@ -223,6 +254,10 @@ void mat_keybord(unsigned char *num_state){
 			}
     	}
 		//ESC
+		if(key2 == MUL[1]){
+				TLED = !TLED;
+        			PRESS = 1;
+				}
         if(key == 0b10111111){
 			PRESS = 1;
 			if(*num_state == 1){
@@ -385,57 +420,3 @@ void lcd_chage(unsigned char num_state){
     }
 }
 
-
-void mul_keybord(){
-		unsigned char key = 0b000000;
-		unsigned char key2 = *CSKB1;                                             
-		unsigned char i = 0; 
-
-		//Sprawdzanie czy wciњniкty zostaі klawisz klawiatury multipleksowanej
-		for (i = 0; i < 6; ++i){
-         	*CSDS = MUL[i];
-			if (KBD == 1){
-				key = MUL[i];
-				break;
-			}
-		}
-		//Otworzenie moїliwoњci wybrania nowego klawisza, po zwolnieniu wszystkich
-		if(key2 == 0b11111111 &&  key == 0b000000 && PRESS == 1){
-			PRESS = 0;
-		}
-		//Rozpatrywanie wciњniкtego klawisza
-		else if (PRESS == 0){
-			//ENTER
-           		if(key == MUL[0]){
-        			TLED = !TLED;
-        			PRESS = 1;
-			}
-			//UP
-			if(key2 == MUL[3]){
-        		TLED = !TLED;
-        		PRESS = 1;
-        	}
-			//DOWN
-           		if(key == MUL[4]){
-        			TLED = !TLED;
-        			PRESS = 1;
-        		}
-			//LEFT
-           		if(key == MUL[5]){
-        			TLED = !TLED;
-        			PRESS = 1;
-        		}
-			//RIGHT
-			if(key == MUL[2]){
-        		TLED = !TLED;
-        		PRESS = 1;
-        	}
-			//ESC
-            if(key == MUL[1]){
-				TLED = !TLED;
-        			PRESS = 1;
-				}
-		}
-		
-	
-}
