@@ -17,6 +17,7 @@ __xdata unsigned char * CSKB1 = (__xdata unsigned char *) 0xFF22;	//klawisze 8..
 __xdata unsigned char * LCDWC = (__xdata unsigned char *) 0xFF80;  
 __xdata unsigned char * LCDWD = (__xdata unsigned char *) 0xFF81;  
 __xdata unsigned char * LCDRC = (__xdata unsigned char *) 0xFF82; 
+__xdata unsigned char * CSDS = (__xdata unsigned char *) 0xFF30;
 
 
 
@@ -27,8 +28,9 @@ void lcd_data(unsigned char);
 void lcd_chage(unsigned char state);
 void mat_keybord(unsigned char *num_state);
 void kwm();
+void mul_keybord();
 
-
+unsigned char MUL[6] = { 0b000001, 0b000010, 0b000100, 0b001000, 0b010000, 0b100000 };
 
 __code unsigned char state[] = {'1','.',' ','C','H','A','N','G','E',' ','S','T','A','T','E', '\0'};
 __code unsigned char settings[] = {'2','.',' ','S','E','T','T','I','N','G','S', '\0'};
@@ -48,7 +50,7 @@ __code unsigned char sel_reset[] = {'>','2','.','2',' ','R','E','S','E','T', '\0
 float const percent = 0.03;
 
 int const LOW = 18432 * 0.03;
-int const HIGH = 18432 - LOW;
+int const HIGH = 18432 - 18432 * 0.03;
 
 
 int TH0_LOW = (47104+LOW)/256;
@@ -60,28 +62,28 @@ int TL0_HIGH =  (47104+HIGH)%256;
 __bit t0_flag;
 
 
-void t0_int( void ) __interrupt( 1 )
-{
-    t0_flag = !t0_flag;
+// void t0_int( void ) __interrupt( 1 )
+// {
+//     t0_flag = !t0_flag;
     
-    TF0=0;
-    if(t0_flag)
-    {
-    	*(CS55B) = 0xFF;
-		TLED = 0;
+//     TF0=0;
+//     if(t0_flag)
+//     {
+//     	*(CS55B) = 0xFF;
+// 		TLED = 0;
 		
-		TL0 = TL0_HIGH;
-		TH0 = TH0_HIGH;
-	}
-    else
-    {
-        *(CS55B) = 0x00;
-        TLED = 1;
+// 		TL0 = TL0_HIGH;
+// 		TH0 = TH0_HIGH;
+// 	}
+//     else
+//     {
+//         *(CS55B) = 0x00;
+//         TLED = 1;
         
-		TL0 = TL0_LOW;
-		TH0 = TH0_LOW;
-    }
-}
+// 		TL0 = TL0_LOW;
+// 		TH0 = TH0_LOW;
+//     }
+// }
 
 
 void main(){
@@ -89,9 +91,12 @@ void main(){
 	lcd_chage(num_state);
 	
 
-	kwm();
+	// kwm();
 	while (1)
 	{
+		
+		mul_keybord();
+		
 		mat_keybord(&num_state);
 	}
 	
@@ -99,24 +104,24 @@ void main(){
 
 
 
-void kwm(){
-	TMOD = 1;
+// void kwm(){
+// 	TMOD = 1;
 
-    ET0=1;
-    EA=1;
+//     ET0=1;
+//     EA=1;
 
-    TF0=0;
-    TR0=1;
+//     TF0=0;
+//     TR0=1;
 
-    *(CS55D) = 0x80;
-}
+//     *(CS55D) = 0x80;
+// }
 
 void mat_keybord(unsigned char *num_state){
 	unsigned char i = 0; 
-    unsigned char key;//zmienna w której trzymam wciœniêty klawisz klawiatury matrycowej    
-	key = *CSKB1;
-	
-	if(key == 0b11111111 && PRESS == 1){
+    unsigned char key = *CSKB1;		
+	unsigned char key2 = 0b000000;
+ 	
+	if(key == 0b11111111 && key2 == 0b000000 && PRESS == 1){
 		PRESS = 0;
 	}
 	
@@ -256,6 +261,8 @@ void mat_keybord(unsigned char *num_state){
 
 
 
+
+
 void lcd_wait_while_busy(){
 	while(*LCDRC & 0b10000000);
 }
@@ -376,4 +383,59 @@ void lcd_chage(unsigned char num_state){
 	    	lcd_data(sel_reset[i]);
 	    }    
     }
+}
+
+
+void mul_keybord(){
+		unsigned char key = 0b000000;
+		unsigned char key2 = *CSKB1;                                             
+		unsigned char i = 0; 
+
+		//Sprawdzanie czy wciњniкty zostaі klawisz klawiatury multipleksowanej
+		for (i = 0; i < 6; ++i){
+         	*CSDS = MUL[i];
+			if (KBD == 1){
+				key = MUL[i];
+				break;
+			}
+		}
+		//Otworzenie moїliwoњci wybrania nowego klawisza, po zwolnieniu wszystkich
+		if(key2 == 0b11111111 &&  key == 0b000000 && PRESS == 1){
+			PRESS = 0;
+		}
+		//Rozpatrywanie wciњniкtego klawisza
+		else if (PRESS == 0){
+			//ENTER
+           		if(key == MUL[0]){
+        			TLED = !TLED;
+        			PRESS = 1;
+			}
+			//UP
+			if(key2 == MUL[3]){
+        		TLED = !TLED;
+        		PRESS = 1;
+        	}
+			//DOWN
+           		if(key == MUL[4]){
+        			TLED = !TLED;
+        			PRESS = 1;
+        		}
+			//LEFT
+           		if(key == MUL[5]){
+        			TLED = !TLED;
+        			PRESS = 1;
+        		}
+			//RIGHT
+			if(key == MUL[2]){
+        		TLED = !TLED;
+        		PRESS = 1;
+        	}
+			//ESC
+            if(key == MUL[1]){
+				TLED = !TLED;
+        			PRESS = 1;
+				}
+		}
+		
+	
 }
