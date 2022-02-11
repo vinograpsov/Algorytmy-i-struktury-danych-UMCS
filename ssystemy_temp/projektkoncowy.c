@@ -26,7 +26,7 @@ void lcd_wait_while_busy();
 void lcd_cmd(unsigned char);
 void lcd_data(unsigned char);
 void lcd_chage(unsigned char state);
-void mat_keybord(unsigned char *num_state);
+void keybord(unsigned char *num_state);
 void kwm();
 void mul_keybord();
 
@@ -62,28 +62,28 @@ int TL0_HIGH =  (47104+HIGH)%256;
 __bit t0_flag;
 
 
-// void t0_int( void ) __interrupt( 1 )
-// {
-//     t0_flag = !t0_flag;
+void t0_int( void ) __interrupt( 1 )
+{
+    t0_flag = !t0_flag;
     
-//     TF0=0;
-//     if(t0_flag)
-//     {
-//     	*(CS55B) = 0xFF;
-// 		TLED = 0;
+    TF0=0;
+    if(t0_flag)
+    {
+    	*(CS55B) = 0xFF;
+		TLED = 0;
 		
-// 		TL0 = TL0_HIGH;
-// 		TH0 = TH0_HIGH;
-// 	}
-//     else
-//     {
-//         *(CS55B) = 0x00;
-//         TLED = 1;
+		TL0 = TL0_HIGH;
+		TH0 = TH0_HIGH;
+	}
+    else
+    {
+        *(CS55B) = 0x00;
+        TLED = 1;
         
-// 		TL0 = TL0_LOW;
-// 		TH0 = TH0_LOW;
-//     }
-// }
+		TL0 = TL0_LOW;
+		TH0 = TH0_LOW;
+    }
+}
 
 
 void main(){
@@ -91,61 +91,59 @@ void main(){
 	lcd_chage(num_state);
 	
 
-	// kwm();
+	kwm();
 	while (1)
 	{
-		
-		// mul_keybord();
-		
-		mat_keybord(&num_state);
+		keybord(&num_state);
 	}
 	
 }
 
 
 
-// void kwm(){
-// 	TMOD = 1;
+void kwm(){
+	TMOD = 1;
 
-//     ET0=1;
-//     EA=1;
+    ET0=1;
+    EA=1;
 
-//     TF0=0;
-//     TR0=1;
+    TF0=0;
+    TR0=1;
 
-//     *(CS55D) = 0x80;
-// }
+    *(CS55D) = 0x80;
+}
 
 
 
-void mat_keybord(unsigned char *num_state){
+void keybord(unsigned char *num_state){
 	unsigned char i = 0; 
     unsigned char key = *CSKB1;		
 	unsigned char key2 = 0b000000;
  		
-		 for (i = 0; i < 6; ++i){
-         	*CSDS = MUL[i];
-			if (KBD == 1){
-				key2 = MUL[i];
-				break;
-			}
+	for (i = 0; i < 6; ++i){
+     	*CSDS = MUL[i];
+		if (KBD == 1){
+			key2 = MUL[i];
+			break;
 		}
+	}
+
 	if(key == 0b11111111 && key2 == 0b000000 && PRESS == 1){
 		PRESS = 0;
 	}
 
 	else if (PRESS == 0){
 		//ENTER
+		
 		if(key2 == MUL[0]){
-        			TLED = !TLED;
-        			PRESS = 1;
-			}
+			TLED = !TLED;
+			PRESS = 1;
+		}
        	if(key == 0b01111111 ){
     		PRESS = 1;
 			if(*num_state == 1){
 				*num_state = 11;
 				lcd_chage(*num_state);
-				
 			}
 			else if(*num_state == 2){
 				*num_state = 21;
@@ -159,29 +157,52 @@ void mat_keybord(unsigned char *num_state){
 				
 			}
 			else if(*num_state ==21){
-				// num_state = 22; потом поменять
+				// num_state = 22; dînîe dîelí?nü
 				// lcd_chage(num_state);
-				
 			}
 			else if(*num_state ==22){
 				
 			}
 		}
 		//LEFT
-           		if(key2 == MUL[5]){
-        			TLED = !TLED;
-        			PRESS = 1;
-        		}
-				//RIGHT
-			if(key2 == MUL[2]){
-        		TLED = !TLED;
-        		PRESS = 1;
-        	}
+        
+		if(key2 == MUL[5]){
+        	if (percent + 10 <= 120){
+				
+				// unsigned char tmp* = &percent;
+				// tmp* = percent + 10;
+
+				// int temp* = &LOW;
+				// temp = 18432 * 3 / 100;
+				// int temp* = &HIGH;
+				// temp* = 18432 - 18432 * 3 / 100;
+				
+				// int temp* = &TH0_LOW;
+				// &TH0_LOW = (47104+LOW)/256;
+				// int temp* = &LOW;
+				// &TL0_LOW = (47104+LOW)%256;
+
+				// int temp* = &LOW;
+				// &TH0_HIGH = (47104+HIGH)/256;
+				// int temp* = &LOW;
+				// &TL0_HIGH =  (47104+HIGH)%256;
+			}
+        	PRESS = 1;
+        }
+		
+		//RIGHT
+		
+		if(key2 == MUL[2]){
+    		TLED = !TLED;
+    		PRESS = 1;
+    	}
 		//UP
+
 		if(key2 == MUL[3]){
-        		TLED = !TLED;
-        		PRESS = 1;
-        	}
+        	TLED = !TLED;
+        	PRESS = 1;
+        }
+
        	if(key == 0b11101111 ){
     		PRESS = 1;
 			if(*num_state == 1){
@@ -216,10 +237,12 @@ void mat_keybord(unsigned char *num_state){
 			}	
     	}
 		//DOWN
+
 		if(key2 == MUL[4]){
-        			TLED = !TLED;
-        			PRESS = 1;
-        		}
+			TLED = !TLED;
+			PRESS = 1;
+        }
+
     	if(key == 0b11011111 ){
     		PRESS = 1;
 			if(*num_state == 1){
@@ -255,9 +278,9 @@ void mat_keybord(unsigned char *num_state){
     	}
 		//ESC
 		if(key2 == MUL[1]){
-				TLED = !TLED;
-        			PRESS = 1;
-				}
+			TLED = !TLED;
+        	PRESS = 1;
+		}
         if(key == 0b10111111){
 			PRESS = 1;
 			if(*num_state == 1){
