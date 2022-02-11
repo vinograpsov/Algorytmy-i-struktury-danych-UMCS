@@ -53,6 +53,7 @@ int const LOW = 18432 * 0.03;
 int const HIGH = 18432 - 18432 * 0.03;
 
 
+
 int TH0_LOW = (47104+LOW)/256;
 int TL0_LOW = (47104+LOW)%256;
 
@@ -61,6 +62,56 @@ int TL0_HIGH =  (47104+HIGH)%256;
 
 __bit t0_flag;
 
+
+
+
+
+__sfr __at (0x87) PCON;
+__sfr __at (0x98) SCON;
+__sfr __at (0x89) TMOD;
+__sfr __at (0x8D) TH1;
+__sfr __at (0x8B) TL1;
+__sfr __at (0x99) SBUF;
+__sbit __at (0x99) TI;
+__sbit __at (0x98) RI;
+__sbit __at (0x8F) TF1;
+__sbit __at (0x8E) TR1;
+__sbit __at (0xAC) ES;
+__sbit __at (0xAF) EA;
+unsigned char index;
+
+__code unsigned char message[8] = {"WITAJ", 13, 10, 0};
+
+__bit rec_flag;
+__bit send_flag;
+
+
+void sio_int(void) __interrupt(4){
+	if (TI){
+		TI = 0;
+		send_flag = 1;
+	}
+	else {
+
+		RI = 0;
+		rec_flag = 1;
+	}
+}
+
+void init(){
+	SCON = 0b01010000;
+	TMOD &= 0b00101111;
+	TMOD |= 0b00100000;
+	TL1 = 0xFD;
+	TH1 = 0xFD;
+	PCON &= 0b01111111;
+	TF1 = 0;
+	TR1 = 1;
+	ES = 1;
+	EA = 1;
+        rec_flag = 0;
+	send_flag = 0;
+}
 
 void t0_int( void ) __interrupt( 1 )
 {
@@ -85,15 +136,30 @@ void t0_int( void ) __interrupt( 1 )
     }
 }
 
-
+void transmisja(){
+	if(rec_flag){
+    	rec_flag = 0;
+    	index = 0;
+        send_flag = 1;
+	}
+	if(send_flag){
+		send_flag = 0;
+		if(message[index] != 0){
+		SBUF = message[index];
+	}
+	++index;
+	}
+}
 void main(){
 	unsigned char num_state = 1;
 	lcd_chage(num_state);
 	
 
 	kwm();
+	init();
 	while (1)
 	{
+		transmisja();
 		keybord(&num_state);
 	}
 	
@@ -169,13 +235,13 @@ void keybord(unsigned char *num_state){
 		if(key2 == MUL[5]){
         	if (percent + 10 <= 120){
 				
-				// unsigned char tmp* = &percent;
-				// tmp* = percent + 10;
+				// float *tmp = &percent;
+				// *tmp = percent + 0.1;
 
-				// int temp* = &LOW;
-				// temp = 18432 * 3 / 100;
-				// int temp* = &HIGH;
-				// temp* = 18432 - 18432 * 3 / 100;
+				// int *temp2 = &LOW;
+				// *temp2 = 18432 * 3 / 100;
+				// int *temp1 = &HIGH;
+				// *temp1 = 18432 - 18432 * 3 / 100;
 				
 				// int temp* = &TH0_LOW;
 				// &TH0_LOW = (47104+LOW)/256;
