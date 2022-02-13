@@ -97,34 +97,6 @@ unsigned char index;
 
 
 
-
-// void sio_int(void) __interrupt(4){
-// 	if (TI){
-// 		TI = 0;
-// 		send_flag = 1;
-// 	}
-// 	else {
-
-// 		RI = 0;
-// 		rec_flag = 1;
-// 	}
-// }
-
-// void init(){
-// 	SCON = 0b01010000;
-// 	TMOD &= 0b00101111;
-// 	TMOD |= 0b00100000;
-// 	TL1 = 0xFD;
-// 	TH1 = 0xFD;
-// 	PCON &= 0b01111111;
-// 	TF1 = 0;
-// 	TR1 = 1;
-// 	ES = 1;
-// 	EA = 1;
-//     rec_flag = 0;
-// 	send_flag = 0;
-// }
-
 void init(){ // ?????????????????????
 	SCON = 0b01010000;
 	TMOD &= 0b00101111;
@@ -165,35 +137,6 @@ void t0_int( void ) __interrupt( 1 ) // pwm
     }
 }
 
-
-// void sio_int(void) __interrupt(4){ // tranmisja
-// 	if (TI){
-// 		TI = 0;
-// 		send_flag = 1;
-// 	}
-// 	else {
-// 		++rec_index;
-// 		rec_buf[rec_index] = SBUF;
-// 		SBUF = SBUF;
-// 		RI = 0;
-// 		rec_flag = 1;
-// 	}
-// }
-
-// void transmisja(){
-// 	if(rec_flag){
-//     	rec_flag = 0;
-//     	index = 0;
-//         send_flag = 1;
-// 	}
-// 	if(send_flag){
-// 		send_flag = 0;
-// 		if(message[index] != 0){
-// 		SBUF = message[index];
-// 	}
-// 	++index;
-// 	}
-// }
 void main(){
 	unsigned char num_state = 1;
 	lcd_chage(num_state);
