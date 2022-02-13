@@ -29,6 +29,8 @@ void lcd_chage(unsigned char state);
 void keybord(unsigned char *num_state);
 void pwm();
 void mul_keybord();
+void to_char(int percent2);
+void from_char(unsigned char percent);
 
 unsigned char MUL[6] = { 0b000001, 0b000010, 0b000100, 0b001000, 0b010000, 0b100000 };
 
@@ -45,10 +47,11 @@ __code unsigned char sel_start[] = {'>','1','.','1',' ','S','T','A','R','T','\0'
 __code unsigned char sel_stop[] = {'>','1','.','2',' ','S','T','O','P','\0'};
 __code unsigned char sel_pwn_line[] = {'>','2','.','2',' ','P','W','M', '\0'};
 __code unsigned char sel_reset[] = {'>','2','.','2',' ','R','E','S','E','T', '\0'};
-__code unsigned char pwn030[] = {'>','2','.','1','.','1',' ','0','3','0','\0'};
-
+unsigned char pwn030[] = {'>','2','.','1','.','1',' ','0','3','0','\0'};
 
 float percent = 30;
+int temp1,temp2,temp3;
+
 
 int const tmpLOW = 18432 * 0.03;
 int const tmpHIGH = 18432 - 18432 * 0.03;
@@ -66,6 +69,13 @@ int TL0_HIGH =  (47104+tmpHIGH)%256;
 __bit t0_flag;
 
 
+// __bit rec_flag;
+// __bit send_flag;
+
+// unsigned char send_index;
+// unsigned char rec_index;
+// unsigned char rec_buf[9];
+// unsigned char send_buf[5];
 
 
 
@@ -84,10 +94,8 @@ __sbit __at (0xAF) EA;
 
 unsigned char index;
 
-__code unsigned char message[8] = {"WITAJ", 13, 10, 0};
 
-__bit rec_flag;
-__bit send_flag;
+
 
 
 // void sio_int(void) __interrupt(4){
@@ -117,7 +125,24 @@ __bit send_flag;
 // 	send_flag = 0;
 // }
 
-void t0_int( void ) __interrupt( 1 )
+// void init(){ // ?????????????????????
+// 	SCON = 0b01010000;
+// 	TMOD &= 0b00101111;
+// 	TMOD |= 0b00100000;
+// 	TL1 = 0xFD;
+// 	TH1 = 0xFD;
+// 	PCON &= 0b01111111;
+// 	TF1 = 0;
+// 	TR1 = 1;
+// 	ES = 1;
+// 	EA = 1;
+//   	rec_flag = 0;
+// 	send_flag = 0;
+// 	send_index = 0;
+// 	rec_index = 0;
+// }
+
+void t0_int( void ) __interrupt( 1 ) // pwm
 {
     t0_flag = !t0_flag;
     
@@ -139,6 +164,21 @@ void t0_int( void ) __interrupt( 1 )
 		TH0 = TH0_LOW;
     }
 }
+
+
+// void sio_int(void) __interrupt(4){ // tranmisja
+// 	if (TI){
+// 		TI = 0;
+// 		send_flag = 1;
+// 	}
+// 	else {
+// 		++rec_index;
+// 		rec_buf[rec_index] = SBUF;
+// 		SBUF = SBUF;
+// 		RI = 0;
+// 		rec_flag = 1;
+// 	}
+// }
 
 // void transmisja(){
 // 	if(rec_flag){
@@ -230,7 +270,7 @@ void keybord(unsigned char *num_state){
 				TR0=1;
 			}
 			else if(*num_state ==12){
-				TMOD = 0; // íå óâåðåí ó âèòè ñðîâèòü 
+				TMOD = 0; // sprosit u witi
 				
 				ET0=0;
     			EA=0;
@@ -270,6 +310,11 @@ void keybord(unsigned char *num_state){
 
 			 	TH0_HIGH = (47104+HIGH)/256;
 			 	TL0_HIGH =  (47104+HIGH)%256;
+
+				to_char(percent);
+				if(*num_state == 211){
+					lcd_chage(*num_state);
+				}
 			}
         	PRESS = 1;
         }
@@ -288,6 +333,11 @@ void keybord(unsigned char *num_state){
 
 			 	TH0_HIGH = (47104+HIGH)/256;
 			 	TL0_HIGH =  (47104+HIGH)%256;
+
+				to_char(percent);
+				if(*num_state == 211){
+					lcd_chage(*num_state);
+				}
 			}
     		PRESS = 1;
     	}
@@ -305,6 +355,11 @@ void keybord(unsigned char *num_state){
 
 			 	TH0_HIGH = (47104+HIGH)/256;
 			 	TL0_HIGH =  (47104+HIGH)%256;
+
+				to_char(percent);
+				if(*num_state == 211){
+					lcd_chage(*num_state);
+				}
 			}
         	PRESS = 1;
         }
@@ -356,6 +411,11 @@ void keybord(unsigned char *num_state){
 
 			 	TH0_HIGH = (47104+HIGH)/256;
 			 	TL0_HIGH =  (47104+HIGH)%256;
+
+				to_char(percent);
+				if(*num_state == 211){
+					lcd_chage(*num_state);
+				}
 			}
 			PRESS = 1;
         }
@@ -573,3 +633,13 @@ void lcd_chage(unsigned char num_state){
 	}
 }
 
+void to_char(int percent2){
+	temp1 = ((percent2 - temp3 - temp2) / 100);
+	temp3 = percent2 % 10;
+	temp2 = ((percent2 - temp3) % 100) / 10;
+
+	pwn030[7] = temp1 + 48;
+	pwn030[8] = temp2 + 48 ;
+	pwn030[9] = temp3 + 48;
+	 
+}
