@@ -69,11 +69,11 @@ int TL0_HIGH =  (47104+tmpHIGH)%256;
 __bit t0_flag;
 
 
-// __bit rec_flag;
-// __bit send_flag;
+__bit rec_flag;
+__bit send_flag;
 
-// unsigned char send_index;
-// unsigned char rec_index;
+unsigned char send_index;
+unsigned char rec_index;
 // unsigned char rec_buf[9];
 // unsigned char send_buf[5];
 
@@ -125,22 +125,22 @@ unsigned char index;
 // 	send_flag = 0;
 // }
 
-// void init(){ // ?????????????????????
-// 	SCON = 0b01010000;
-// 	TMOD &= 0b00101111;
-// 	TMOD |= 0b00100000;
-// 	TL1 = 0xFD;
-// 	TH1 = 0xFD;
-// 	PCON &= 0b01111111;
-// 	TF1 = 0;
-// 	TR1 = 1;
-// 	ES = 1;
-// 	EA = 1;
-//   	rec_flag = 0;
-// 	send_flag = 0;
-// 	send_index = 0;
-// 	rec_index = 0;
-// }
+void init(){ // ?????????????????????
+	SCON = 0b01010000;
+	TMOD &= 0b00101111;
+	TMOD |= 0b00100000;
+	TL1 = 0xFD;
+	TH1 = 0xFD;
+	PCON &= 0b01111111;
+	TF1 = 0;
+	TR1 = 1;
+	ES = 1;
+	EA = 1;
+  	rec_flag = 0;
+	send_flag = 0;
+	send_index = 0;
+	rec_index = 0;
+}
 
 void t0_int( void ) __interrupt( 1 ) // pwm
 {
@@ -200,7 +200,7 @@ void main(){
 	
 
 	pwm();
-	// init();
+	init();
 	while (1)
 	{
 		// transmisja();
@@ -293,6 +293,8 @@ void keybord(unsigned char *num_state){
 
 			 	TH0_HIGH = (47104+HIGH)/256;
 			 	TL0_HIGH =  (47104+HIGH)%256;
+
+				to_char(percent); 
 			}
 
 		}
@@ -634,12 +636,15 @@ void lcd_chage(unsigned char num_state){
 }
 
 void to_char(int percent2){
-	temp1 = ((percent2 - temp3 - temp2) / 100);
 	temp3 = percent2 % 10;
 	temp2 = ((percent2 - temp3) % 100) / 10;
+	temp1 = ((percent2 - temp3 - temp2) / 100);
 
 	pwn030[7] = temp1 + 48;
 	pwn030[8] = temp2 + 48 ;
 	pwn030[9] = temp3 + 48;
-	 
 }
+
+// void from_char(){
+	
+// }
