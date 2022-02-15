@@ -14,9 +14,11 @@ __xdata unsigned char * CS55B = (__xdata unsigned char *) 0xFF29;
 __xdata unsigned char * CS55D = (__xdata unsigned char *) 0xFF2B;
 __xdata unsigned char * CSKB0 = (__xdata unsigned char *) 0xFF21;	//klawisze 0...7
 __xdata unsigned char * CSKB1 = (__xdata unsigned char *) 0xFF22;	//klawisze 8...
+
 __xdata unsigned char * LCDWC = (__xdata unsigned char *) 0xFF80;  
 __xdata unsigned char * LCDWD = (__xdata unsigned char *) 0xFF81;  
 __xdata unsigned char * LCDRC = (__xdata unsigned char *) 0xFF82; 
+
 __xdata unsigned char * CSDS = (__xdata unsigned char *) 0xFF30;
 
 
@@ -30,7 +32,8 @@ void keybord(unsigned char *num_state);
 void pwm();
 void mul_keybord();
 void to_char(int percent2);
-void from_char(unsigned char percent);
+void from_char();
+void trans();
 
 unsigned char MUL[6] = { 0b000001, 0b000010, 0b000100, 0b001000, 0b010000, 0b100000 };
 
@@ -50,7 +53,7 @@ __code unsigned char sel_reset[] = {'>','2','.','2',' ','R','E','S','E','T', '\0
 unsigned char pwn030[] = {'>','2','.','1','.','1',' ','0','3','0','\0'};
 
 float percent = 30;
-int temp1,temp2,temp3;
+int temp1,temp2,temp3,temp7;
 
 
 int const tmpLOW = 18432 * 0.03;
@@ -58,6 +61,8 @@ int const tmpHIGH = 18432 - 18432 * 0.03;
 
 int LOW;
 int HIGH;
+unsigned int min_b = 30;
+unsigned int max_b = 750;
 
 
 int TH0_LOW = (47104+tmpLOW)/256;
@@ -66,17 +71,16 @@ int TL0_LOW = (47104+tmpLOW)%256;
 int TH0_HIGH = (47104+tmpHIGH)/256;
 int TL0_HIGH =  (47104+tmpHIGH)%256;
 
-__bit t0_flag;
+__sbit __at (0x19) t0_flag; // kawo
+
+int temp4,temp5,temp6;
 
 
-__bit rec_flag;
-__bit send_flag;
+unsigned char rec_index = 0;
+unsigned char rec_buf[4];
 
-unsigned char send_index;
-unsigned char rec_index;
-// unsigned char rec_buf[9];
-// unsigned char send_buf[5];
 
+__sbit __at (0x23) rec_flag;
 
 
 __sfr __at (0x87) PCON;
@@ -91,14 +95,21 @@ __sbit __at (0x8F) TF1;
 __sbit __at (0x8E) TR1;
 __sbit __at (0xAC) ES;
 __sbit __at (0xAF) EA;
-
-unsigned char index;
-
+__sbit __at (0x97) TLED;
 
 
+void sio_int(void) __interrupt(4){
+	if(!TI) {
+		rec_buf[rec_index] = SBUF;
+		++rec_index;
+		RI = 0;
+		rec_flag = 1;
+	}
+}
 
-void init(){ // ?????????????????????
+void init(){
 	SCON = 0b01010000;
+	TMOD = 1 ;
 	TMOD &= 0b00101111;
 	TMOD |= 0b00100000;
 	TL1 = 0xFD;
@@ -108,11 +119,10 @@ void init(){ // ?????????????????????
 	TR1 = 1;
 	ES = 1;
 	EA = 1;
-  	rec_flag = 0;
-	send_flag = 0;
-	send_index = 0;
+    rec_flag = 0;
 	rec_index = 0;
 }
+
 
 void t0_int( void ) __interrupt( 1 ) // pwm
 {
@@ -137,25 +147,33 @@ void t0_int( void ) __interrupt( 1 ) // pwm
     }
 }
 
-void main(){
-	unsigned char num_state = 1;
-	lcd_chage(num_state);
-	
 
-	pwm();
+
+void main(){
+
+	unsigned char num_state = 1;
+
+	lcd_chage(num_state);
+	// lcd_init();
 	init();
+	pwm();
 	while (1)
 	{
-		// transmisja();
+		if(rec_flag){
+			if(rec_index == 3){
+				from_char();
+				rec_index = 0;
+			}
+            rec_flag = 0;
+		}
 		keybord(&num_state);
 	}
-	
 }
 
 
 
 void pwm(){
-	TMOD = 1;
+	// TMOD = 1;
 
     ET0=1;
     EA=1;
@@ -203,22 +221,10 @@ void keybord(unsigned char *num_state){
 				lcd_chage(*num_state);
 				
 			}
-			else if (*num_state ==11){
-				TMOD = 1;
-
-				ET0=1;
-    			EA=1;
-
-    			TF0=0;
+			else if (*num_state ==11){ // tr0 
 				TR0=1;
 			}
 			else if(*num_state ==12){
-				TMOD = 0; // sprosit u witi
-				
-				ET0=0;
-    			EA=0;
-
-    			TF0=1;
     			TR0=0;
 			}
 			else if(*num_state ==21){
@@ -244,7 +250,7 @@ void keybord(unsigned char *num_state){
 		//LEFT
         
 		if(key2 == MUL[5]){
-        	if (percent - 10 >= 30){
+        	if (percent - 10 >= min_b){
 				percent -= 10;
 				
 				LOW = 18432 * percent/1000;
@@ -267,7 +273,7 @@ void keybord(unsigned char *num_state){
 		//RIGHT
 		
 		if(key2 == MUL[2]){
-    		if (percent + 10 <= 120){
+    		if (percent + 10 <= max_b){
 				percent += 10;
 				
 				LOW = 18432 * percent/1000;
@@ -289,7 +295,7 @@ void keybord(unsigned char *num_state){
 		//UP
 
 		if(key2 == MUL[3]){
-        	if (percent + 1 <= 120){
+        	if (percent + 1 <= max_b){
 				percent += 1;
 				
 				LOW = 18432 * percent/1000;
@@ -345,7 +351,7 @@ void keybord(unsigned char *num_state){
 		//DOWN
 		
 		if(key2 == MUL[4]){
-			if (percent - 1 >= 30){
+			if (percent - 1 >= min_b){
 				percent -= 1;
 				
 				LOW = 18432 * percent/1000;
@@ -588,6 +594,34 @@ void to_char(int percent2){
 	pwn030[9] = temp3 + 48;
 }
 
-// void from_char(){
+void from_char(){
+	unsigned int number1 = rec_buf[0] - 48;
+	unsigned int number2 = rec_buf[1] - 48;
+	unsigned int number3 = rec_buf[2] - 48;
+	unsigned char i = 0;
+	unsigned int number4 = number1 * 100 + number2 * 10 + number3;
+
+	rec_index = 0;
+
+	if(number4 <= max_b && number4 >= min_b){
+		percent = number4;
+		
+		LOW = 18432 * percent/1000;
+		HIGH = 18432 - LOW;
+
+		TH0_LOW = (47104+LOW)/256;
+		TL0_LOW = (47104+LOW)%256;
+		
+		TH0_HIGH = (47104+HIGH)/256;
+		TL0_HIGH =  (47104+HIGH)%256;
+		to_char(percent);
+
+			rec_buf[3] = '\0';
+
+	// 		for(i = 0; i < rec_buf[i] != '\0'; ++i){
+	// 	lcd_data(rec_buf[i]);
+	// }
 	
-// }
+	// lcd_cmd(0b11000000);
+	}
+}
