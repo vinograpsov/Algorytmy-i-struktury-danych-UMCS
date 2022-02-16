@@ -32,10 +32,11 @@ void keybord(unsigned char *num_state);
 void pwm();
 void mul_keybord();
 void to_char(int percent2);
-void from_char();
+void from_char(unsigned char *num_state);
 void trans();
 
 unsigned char MUL[6] = { 0b000001, 0b000010, 0b000100, 0b001000, 0b010000, 0b100000 };
+
 
 __code unsigned char state[] = {'1','.',' ','C','H','A','N','G','E',' ','S','T','A','T','E', '\0'};
 __code unsigned char settings[] = {'2','.',' ','S','E','T','T','I','N','G','S', '\0'};
@@ -77,7 +78,7 @@ int temp4,temp5,temp6;
 
 
 unsigned char rec_index = 0;
-unsigned char rec_buf[4];
+unsigned char rec_buf[3];
 
 
 __sbit __at (0x23) rec_flag;
@@ -151,8 +152,8 @@ void t0_int( void ) __interrupt( 1 ) // pwm
 
 void main(){
 
+	
 	unsigned char num_state = 1;
-
 	lcd_chage(num_state);
 	// lcd_init();
 	init();
@@ -161,7 +162,7 @@ void main(){
 	{
 		if(rec_flag){
 			if(rec_index == 3){
-				from_char();
+				from_char(&num_state);
 				rec_index = 0;
 			}
             rec_flag = 0;
@@ -594,7 +595,7 @@ void to_char(int percent2){
 	pwn030[9] = temp3 + 48;
 }
 
-void from_char(){
+void from_char(unsigned char *num_state){
 	unsigned int number1 = rec_buf[0] - 48;
 	unsigned int number2 = rec_buf[1] - 48;
 	unsigned int number3 = rec_buf[2] - 48;
@@ -616,12 +617,8 @@ void from_char(){
 		TL0_HIGH =  (47104+HIGH)%256;
 		to_char(percent);
 
-			rec_buf[3] = '\0';
-
-	// 		for(i = 0; i < rec_buf[i] != '\0'; ++i){
-	// 	lcd_data(rec_buf[i]);
-	// }
-	
-	// lcd_cmd(0b11000000);
+		if(*num_state == 211){
+			lcd_chage(*num_state);
+		}
 	}
 }
