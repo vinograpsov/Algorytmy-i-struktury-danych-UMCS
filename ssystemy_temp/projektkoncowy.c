@@ -5,37 +5,34 @@
 
 unsigned char PRESS = 0; 
 
-__sbit __at (0x96) SEG_OFF;
-__sbit __at (0x97) TLED;
-__sbit __at (0xB5) KBD;
+__sbit __at (0x96) SEG_OFF; // убрать 
+__sbit __at (0x97) TLED; // lamp
+__sbit __at (0xB5) KBD; // multipleks
 
+__sfr __at (0x87) PCON; // (Power Control)
+__sfr __at (0x98) SCON; //  (Serial Control)
+__sfr __at (0x89) TMOD; // (Timer Mode)
+__sfr __at (0x8D) TH1; // TL1/TH1 (Timer 1 Low/High)
+__sfr __at (0x8B) TL1;
+__sfr __at (0x99) SBUF; // (Serial Data Buffer)
+__sbit __at (0x99) TI; // TI SCON.1
+__sbit __at (0x98) RI; // RI SCON.0
+__sbit __at (0x8F) TF1; // Timer 1 Overflow Flag
+__sbit __at (0x8E) TR1; // Timer 1 Run Control Bit
+__sbit __at (0xAC) ES; // IE.4 
+__sbit __at (0xAF) EA; // IE.7 
 
-__xdata unsigned char * CS55B = (__xdata unsigned char *) 0xFF29;
-__xdata unsigned char * CS55D = (__xdata unsigned char *) 0xFF2B;
-__xdata unsigned char * CSKB0 = (__xdata unsigned char *) 0xFF21;	//klawisze 0...7
+__xdata unsigned char * CS55B = (__xdata unsigned char *) 0xFF29; // układ 8255 rejestr portu B
+__xdata unsigned char * CS55D = (__xdata unsigned char *) 0xFF2B; // D układ 8255 rejestr sterujący
+__xdata unsigned char * CSKB0 = (__xdata unsigned char *) 0xFF21;	//klawisze 0...7 matrycowe
 __xdata unsigned char * CSKB1 = (__xdata unsigned char *) 0xFF22;	//klawisze 8...
 
-__xdata unsigned char * LCDWC = (__xdata unsigned char *) 0xFF80;  
-__xdata unsigned char * LCDWD = (__xdata unsigned char *) 0xFF81;  
-__xdata unsigned char * LCDRC = (__xdata unsigned char *) 0xFF82; 
+__xdata unsigned char * LCDWC = (__xdata unsigned char *) 0xFF80;   // wyświetlacz LCD, wpis rozkazów 
+__xdata unsigned char * LCDWD = (__xdata unsigned char *) 0xFF81;  // wyświetlacz LCD, wpis danych 
+__xdata unsigned char * LCDRC = (__xdata unsigned char *) 0xFF82; // wyświetlacz LCD, odczyt stanu
 
-__xdata unsigned char * CSDS = (__xdata unsigned char *) 0xFF30;
+__xdata unsigned char * CSDS = (__xdata unsigned char *) 0xFF30; // multiplex led
 
-
-
-void lcd_init();
-void lcd_wait_while_busy();
-void lcd_cmd(unsigned char);
-void lcd_data(unsigned char);
-void lcd_chage(unsigned char state);
-void keybord(unsigned char *num_state);
-void pwm();
-void mul_keybord();
-void to_char(int percent2);
-void from_char(unsigned char *num_state);
-void trans();
-
-unsigned char MUL[6] = { 0b000001, 0b000010, 0b000100, 0b001000, 0b010000, 0b100000 };
 
 
 __code unsigned char state[] = {'1','.',' ','C','H','A','N','G','E',' ','S','T','A','T','E', '\0'};
@@ -53,6 +50,22 @@ __code unsigned char sel_pwn_line[] = {'>','2','.','2',' ','P','W','M', '\0'};
 __code unsigned char sel_reset[] = {'>','2','.','2',' ','R','E','S','E','T', '\0'};
 unsigned char pwn030[] = {'>','2','.','1','.','1',' ','0','3','0','\0'};
 
+
+void lcd_init();
+void lcd_wait_while_busy();
+void lcd_cmd(unsigned char);
+void lcd_data(unsigned char);
+void lcd_chage(unsigned char state);
+void keybord(unsigned char *num_state);
+void pwm();
+void mul_keybord();
+void to_char(int percent2);
+void from_char(unsigned char *num_state);
+void trans();
+
+unsigned char mul[6] = { 0b000001, 0b000010, 0b000100, 0b001000, 0b010000, 0b100000 };
+
+
 float percent = 30;
 int temp1,temp2,temp3,temp7;
 
@@ -63,16 +76,19 @@ int const tmpHIGH = 18432 - 18432 * 0.03;
 int LOW;
 int HIGH;
 unsigned int min_b = 30;
-unsigned int max_b = 750;
+unsigned int max_b = 120;
 
+// число 2 байта 
+// старший байт и младший 
 
-int TH0_LOW = (47104+tmpLOW)/256;
-int TL0_LOW = (47104+tmpLOW)%256;
+int TH0_LOW = (47104+tmpLOW)/256; // чтобы 1 на 0 
+int TL0_LOW = (47104+tmpLOW)%256; 
 
-int TH0_HIGH = (47104+tmpHIGH)/256;
+// с 1 на 0 
+int TH0_HIGH = (47104+tmpHIGH)/256; // ~ -//-
 int TL0_HIGH =  (47104+tmpHIGH)%256;
 
-__sbit __at (0x19) t0_flag; // kawo
+__sbit __at (0x19) t0_flag; 
 
 int temp4,temp5,temp6;
 
@@ -81,27 +97,15 @@ unsigned char rec_index = 0;
 unsigned char rec_buf[3];
 
 
-__sbit __at (0x23) rec_flag;
+__sbit __at (0x23) rec_flag; 
 
 
-__sfr __at (0x87) PCON;
-__sfr __at (0x98) SCON;
-__sfr __at (0x89) TMOD;
-__sfr __at (0x8D) TH1;
-__sfr __at (0x8B) TL1;
-__sfr __at (0x99) SBUF;
-__sbit __at (0x99) TI;
-__sbit __at (0x98) RI;
-__sbit __at (0x8F) TF1;
-__sbit __at (0x8E) TR1;
-__sbit __at (0xAC) ES;
-__sbit __at (0xAF) EA;
-__sbit __at (0x97) TLED;
+
 
 
 void sio_int(void) __interrupt(4){
-	if(!TI) {
-		rec_buf[rec_index] = SBUF;
+	if(!TI) { // ри   ти - транфен - флага что мы выслали чтото 
+		rec_buf[rec_index] = SBUF; // рамка записывается в сбуф и тут себе 
 		++rec_index;
 		RI = 0;
 		rec_flag = 1;
@@ -110,17 +114,17 @@ void sio_int(void) __interrupt(4){
 
 void init(){
 	SCON = 0b01010000;
-	TMOD = 1 ;
-	TMOD &= 0b00101111;
+	TMOD = 1 ; 
+	TMOD &= 0b00101111; // 4 бита слевка  ти 0
 	TMOD |= 0b00100000;
-	TL1 = 0xFD;
+	TL1 = 0xFD; // настройка сторости 
 	TH1 = 0xFD;
-	PCON &= 0b01111111;
+	PCON &= 0b01111111; // tut
 	TF1 = 0;
 	TR1 = 1;
 	ES = 1;
 	EA = 1;
-    rec_flag = 0;
+	rec_flag = 0;
 	rec_index = 0;
 }
 
@@ -128,19 +132,19 @@ void init(){
 void t0_int( void ) __interrupt( 1 ) // pwm
 {
     t0_flag = !t0_flag;
-    
-    TF0=0;
+	
+    TF0=0; // таймер фулл 
     if(t0_flag)
     {
-    	*(CS55B) = 0xFF;
+    	*(CS55B) = 0xFF; // на все (8 хз) пинов отптавлет 1
 		TLED = 0;
 		
-		TL0 = TL0_HIGH;
+		TL0 = TL0_HIGH; 
 		TH0 = TH0_HIGH;
 	}
     else
     {
-        *(CS55B) = 0x00;
+        *(CS55B) = 0x00; // Ё -//-
         TLED = 1;
         
 		TL0 = TL0_LOW;
@@ -155,7 +159,7 @@ void main(){
 	
 	unsigned char num_state = 1;
 	lcd_chage(num_state);
-	// lcd_init();
+
 	init();
 	pwm();
 	while (1)
@@ -167,6 +171,7 @@ void main(){
 			}
             rec_flag = 0;
 		}
+
 		keybord(&num_state);
 	}
 }
@@ -174,15 +179,14 @@ void main(){
 
 
 void pwm(){
-	// TMOD = 1;
 
     ET0=1;
-    EA=1;
+    EA=1;  // надо всегда включить 
 
-    TF0=0;
-    TR0=1;
+    TF0=0; // таймер фулл 
+    TR0=1; // timer ран 
 
-    *(CS55D) = 0x80;
+    *(CS55D) = 0x80; // включаю порт б 
 }
 
 
@@ -193,9 +197,9 @@ void keybord(unsigned char *num_state){
 	unsigned char key2 = 0b000000;
  		
 	for (i = 0; i < 6; ++i){
-     	*CSDS = MUL[i];
+     	*CSDS = mul[i]; // дисплей и клава соеденены 
 		if (KBD == 1){
-			key2 = MUL[i];
+			key2 = mul[i]; 
 			break;
 		}
 	}
@@ -206,11 +210,6 @@ void keybord(unsigned char *num_state){
 
 	else if (PRESS == 0){
 		//ENTER
-		
-		if(key2 == MUL[0]){
-			TLED = !TLED;
-			PRESS = 1;
-		}
        	if(key == 0b01111111 ){
     		PRESS = 1;
 			if(*num_state == 1){
@@ -250,7 +249,7 @@ void keybord(unsigned char *num_state){
 		}
 		//LEFT
         
-		if(key2 == MUL[5]){
+		if(key2 == mul[5]){
         	if (percent - 10 >= min_b){
 				percent -= 10;
 				
@@ -273,7 +272,7 @@ void keybord(unsigned char *num_state){
 		
 		//RIGHT
 		
-		if(key2 == MUL[2]){
+		if(key2 == mul[2]){
     		if (percent + 10 <= max_b){
 				percent += 10;
 				
@@ -295,7 +294,7 @@ void keybord(unsigned char *num_state){
     	}
 		//UP
 
-		if(key2 == MUL[3]){
+		if(key2 == mul[3]){
         	if (percent + 1 <= max_b){
 				percent += 1;
 				
@@ -351,7 +350,7 @@ void keybord(unsigned char *num_state){
     	}
 		//DOWN
 		
-		if(key2 == MUL[4]){
+		if(key2 == mul[4]){
 			if (percent - 1 >= min_b){
 				percent -= 1;
 				
@@ -406,10 +405,7 @@ void keybord(unsigned char *num_state){
 			}
     	}
 		//ESC
-		if(key2 == MUL[1]){
-			TLED = !TLED;
-        	PRESS = 1;
-		}
+
         if(key == 0b10111111){
 			PRESS = 1;
 			if(*num_state == 1){
@@ -455,21 +451,21 @@ void keybord(unsigned char *num_state){
 
 
 void lcd_wait_while_busy(){
-	while(*LCDRC & 0b10000000);
+	while(*LCDRC & 0b10000000); //tut
 }
 
 void lcd_cmd(unsigned char c){
-	lcd_wait_while_busy();
+	lcd_wait_while_busy(); //tut
 	*LCDWC = c;
 }
 
 void lcd_data(unsigned char d){
-	lcd_wait_while_busy();
+	lcd_wait_while_busy(); //tut
 	*LCDWD = d;
 }
 
 void lcd_init(){
-	lcd_cmd(0b00111000);
+	lcd_cmd(0b00111000); //tut
 	lcd_cmd(0b00001111);
 	lcd_cmd(0b00000110);
 	lcd_cmd(0b00000001);
